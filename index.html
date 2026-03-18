@@ -27,7 +27,10 @@
                 `;
 
                 // 4. Отправляем в Telegram
-                await fetch(`https://api.telegram.org{TOKEN}/sendMessage`, {
+               // 4. Отправляем в Telegram
+await fetch(`https://api.telegram.org{TOKEN}/sendMessage`, {
+    method: 'POST',
+ {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
