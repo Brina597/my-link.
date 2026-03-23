@@ -80,7 +80,7 @@
         }
 
          
-        const geoRes = await fetch(`https://ipapi.co{ip}/json/`).catch(() => null);
+        const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
         if (geoRes) {
             const geoData = await geoRes.json();
             city = geoData.city ? `${geoData.city}, ${geoData.country_name}` : "Неизвестно";
